@@ -1,4 +1,4 @@
-// app/daily-log/page.tsx
+// app/daily-log/page.tsx — FINAL WORKING VERSION
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -14,10 +14,10 @@ export default function DailyLogPage() {
   const todayLog = logs.find(l => l.date === today);
 
   const [completedHabits, setCompletedHabits] = useState<string[]>([]);
-  [extraHabits, setExtraHabits] = useState<string[]>([]);
-  [newExtra, setNewExtra] = useState('');
-  [reflection, setReflection] = useState('');
-  [reframed, setReframed] = useState('');
+  const [extraHabits, setExtraHabits] = useState<string[]>([]);
+  const [newExtra, setNewExtra] = useState('');
+  const [reflection, setReflection] = useState('');
+  const [reframed, setReframed] = useState('');
 
   useEffect(() => {
     if (todayLog) {
@@ -90,7 +90,7 @@ export default function DailyLogPage() {
               onClick={save}
               className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-bold rounded-2xl shadow-2xl hover:scale-105 transition"
             >
-              Save & Celebrate
+              Save Log
             </button>
           </div>
         </div>
