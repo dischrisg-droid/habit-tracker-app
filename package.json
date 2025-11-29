@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
-"@types/canvas-confetti": "^1.6.5"
+    "canvas-confetti": "^1.9.3",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.445.0",
     "next": "14.2.5",
@@ -22,6 +22,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/canvas-confetti": "^1.6.5",
     "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
@@ -30,6 +31,7 @@
     "typescript": "^5"
   }
 }
+
 
 
 
