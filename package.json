@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2",
+    "canvas-confetti": "^1.9.3",
     "date-fns": "^3.6.0",
     "install": "^0.13.0",
     "lucide-react": "^0.555.0",
@@ -28,3 +29,4 @@
     "typescript": "^5"
   }
 }
+
