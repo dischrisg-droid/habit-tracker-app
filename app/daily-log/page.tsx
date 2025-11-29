@@ -1,5 +1,5 @@
 // app/daily-log/page.tsx
-'use client';
+'use client'; 
 
 import { useStore } from '../../store/useStore';
 import { useState, useEffect } from 'react';
