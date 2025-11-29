@@ -1,6 +1,4 @@
 'use client';
-import '../../globals.css';   // ← ADD THIS LINE
-
 import { useStore } from '../../store/useStore';
 import { useState } from 'react';
 import { Plus, Edit2, Trash2, Flame, ArrowLeft, Sparkles } from 'lucide-react';
@@ -279,4 +277,5 @@ export default function HabitsPage() {
     </>
   );
 }
+
 
