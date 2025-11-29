@@ -1,70 +1,63 @@
 'use client';
 
-import './globals.css';
+import './globals.css';  // This is the key import for all pages
+
 import Link from 'next/link';
 import { useStore } from '../store/useStore';
 import { useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const { user, authLoading, initAuth } = useStore();
+  const router = useRouter();
 
   useEffect(() => {
     initAuth();
   }, []);
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  };
+
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: 'system-ui, sans-serif', background: '#f9fafb' }}>
-        <header style={{
-          padding: '1rem 2rem',
-          background: 'white',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-        }}>
-          <Link href="/" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', textDecoration: 'none' }}>
-            Habit Tracker & Journal
-          </Link>
-          {!authLoading && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              {user ? (
-                <>
-                  <span style={{ color: '#6b7280', fontSize: '0.9rem' }}>{user.email}</span>
-                  <form action="/auth/signout" method="post">
-                    <button style={{
-                      padding: '0.5rem 1rem',
-                      background: '#ef4444',
-                      color: 'white',
-                      borderRadius: '0.5rem',
-                      border: 'none',
-                      fontWeight: 'bold',
-                    }}>
+      <body className="bg-gray-50 min-h-screen">
+        <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <Link href="/" className="text-2xl font-bold text-gray-900">
+              Habit Tracker & Journal
+            </Link>
+            {!authLoading && (
+              <>
+                {user ? (
+                  <div className="flex items-center gap-4">
+                    <span className="text-gray-600">{user.email}</span>
+                    <button
+                      onClick={handleLogout}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition"
+                    >
                       Logout
                     </button>
-                  </form>
-                </>
-              ) : (
-                <Link href="/login" style={{
-                  padding: '0.5rem 1rem',
-                  background: '#3b82f6',
-                  color: 'white',
-                  borderRadius: '0.5rem',
-                  textDecoration: 'none',
-                  fontWeight: 'bold',
-                }}>
-                  Login
-                </Link>
-              )}
-            </div>
-          )}
+                  </div>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition"
+                  >
+                    Login
+                  </Link>
+                )}
+              </>
+            )}
+          </div>
         </header>
         <main>{children}</main>
       </body>
