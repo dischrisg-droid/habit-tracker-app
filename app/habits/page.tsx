@@ -10,10 +10,17 @@ export default function HabitsPage() {
 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const [form, setForm] = useState({
+
+  const [form, setForm] = useState<{
+    name: string;
+    frequency: 'daily' | 'weekly';
+    days: number[];
+    targettime: string;
+    notes: string;
+  }>({
     name: '',
-    frequency: 'daily' as const,
-    days: [] as number[],
+    frequency: 'daily',
+    days: [],
     targettime: '',
     notes: '',
   });
@@ -38,6 +45,7 @@ export default function HabitsPage() {
 
   const handleSave = async () => {
     if (!form.name.trim()) return;
+
     const newHabit = editing
       ? { ...editing, ...form, name: form.name.trim() }
       : { id: crypto.randomUUID(), ...form, name: form.name.trim() };
@@ -104,7 +112,6 @@ export default function HabitsPage() {
                     key={habit.id}
                     className="group relative bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden hover:-translate-y-4 hover:shadow-3xl transition-all duration-500"
                   >
-                    {/* Streak Badge */}
                     {streak > 0 && (
                       <div className="absolute -top-6 -right-6 bg-gradient-to-br from-orange-500 to-pink-600 text-white px-7 py-4 rounded-full font-black text-3xl shadow-2xl flex items-center gap-2 animate-pulse">
                         <Flame className="w-10 h-10" />
@@ -123,7 +130,8 @@ export default function HabitsPage() {
                         </p>
                         {habit.targettime && (
                           <p>
-                            <span className="font-semibold text-pink-600">Best time:</span> {habit.targettime}
+                            <span className="font-semibold text-pink-600">Best time:</span>{' '}
+                            {habit.targettime}
                           </p>
                         )}
                         {habit.notes && (
@@ -138,7 +146,7 @@ export default function HabitsPage() {
                           {isDone ? 'Done today' : 'Not done yet'}
                         </span>
 
-                        <div className="flex gap-4 ml-auto">
+                        <div className="flex gap-4">
                           <button
                             onClick={() => {
                               setEditing(habit);
@@ -156,7 +164,11 @@ export default function HabitsPage() {
                             <Edit2 className="w-7 h-7 text-indigo-700" />
                           </button>
                           <button
-                            onClick={() => confirm('Delete forever?') && saveHabits(habits.filter((h) => h.id !== habit.id))}
+                            onClick={() => {
+                              if (confirm('Delete forever?')) {
+                                saveHabits(habits.filter((h) => h.id !== habit.id));
+                              }
+                            }}
                             className="p-4 bg-red-100 rounded-2xl hover:bg-red-200 transition"
                           >
                             <Trash2 className="w-7 h-7 text-red-600" />
@@ -180,7 +192,7 @@ export default function HabitsPage() {
         {/* Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex items-center justify-center p-6 z-50">
-            <div className="bg-white rounded-3xl shadow-3xl p-12 max-w-2xl w-full">
+            <div className="bg-white rounded-3xl shadow-3xl p-12 max-w-2xl w-full max-h-screen overflow-y-auto">
               <h2 className="text-5xl font-black text-center mb-12 bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
                 {editing ? 'Edit Habit' : 'New Habit'}
               </h2>
