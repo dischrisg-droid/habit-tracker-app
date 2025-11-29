@@ -1,98 +1,57 @@
 'use client';
 
-import { useStore } from '../store/useStore';
 import Link from 'next/link';
+import { useStore } from '../store/useStore';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-
-
 export default function HomePage() {
-  const { user, initAuth, authLoading } = useStore();
+  const { user, authLoading } = useStore();
   const router = useRouter();
 
   useEffect(() => {
-    initAuth();
-  }, [initAuth]);
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.replace('/login');  // Replace to avoid back button loop
-    }
+    if (!authLoading && !user) router.replace('/login');
   }, [authLoading, user, router]);
 
   if (authLoading || !user) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        Loading...
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600">
+        <div className="text-4xl font-bold text-white">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '2rem',
-    }}>
-      <div style={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-20 px-6">
+      <div className="max-w-5xl mx-auto text-center">
+        <h1 className="text-6xl md:text-8xl font-black mb-8 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
           Welcome back!
         </h1>
-        <p style={{ fontSize: '1.2rem', color: '#6b7280', marginBottom: '3rem' }}>
-          Let's make today count.
-        </p>
-        <div style={{ display: 'grid', gap: '1.5rem' }}>
-          <Link
-            href="/habits"
-            style={{
-              padding: '1.5rem',
-              background: 'white',
-              borderRadius: '0.75rem',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              fontSize: '1.25rem',
-              fontWeight: 'bold',
-              color: '#3b82f6',
-              textDecoration: 'none',
-              transition: 'transform 0.2s',
-            }}
-          >
-            My Habits
+        <p className="text-3xl text-gray-700 mb-16">Let's make today legendary.</p>
+
+        <div className="grid md:grid-cols-3 gap-10">
+          <Link href="/habits" className="group">
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-16 shadow-2xl hover:shadow-3xl hover:-translate-y-6 transition-all duration-500 border border-white/50">
+              <h2 className="text-5xl font-black text-indigo-600 group-hover:scale-110 transition">
+                My Habits
+              </h2>
+            </div>
           </Link>
-          <Link
-            href="/daily-log"
-            style={{
-              padding: '1.5rem',
-              background: 'white',
-              borderRadius: '0.75rem',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              fontSize: '1.25rem',
-              fontWeight: 'bold',
-              color: '#8b5cf6',
-              textDecoration: 'none',
-              transition: 'transform 0.2s',
-            }}
-          >
-            Daily Log
+
+          <Link href="/daily-log" className="group">
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-16 shadow-2xl hover:shadow-3xl hover:-translate-y-6 transition-all duration-500 border border-white/50">
+              <h2 className="text-5xl font-black text-purple-600 group-hover:scale-110 transition">
+                Daily Log
+              </h2>
+            </div>
           </Link>
-          <Link
-            href="/personality"
-            style={{
-              padding: '1.5rem',
-              background: 'white',
-              borderRadius: '0.75rem',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              fontSize: '1.25rem',
-              fontWeight: 'bold',
-              color: '#10b981',
-              textDecoration: 'none',
-              transition: 'transform 0.2s',
-            }}
-          >
-            Personality Profile
+
+          <Link href="/personality" className="group">
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-16 shadow-2xl hover:shadow-3xl hover:-translate-y-6 transition-all duration-500 border border-white/50">
+              <h2 className="text-5xl font-black text-pink-600 group-hover:scale-110 transition">
+                Personality
+              </h2>
+            </div>
           </Link>
         </div>
       </div>
