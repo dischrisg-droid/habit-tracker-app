@@ -1,5 +1,5 @@
 // app/daily-log/page.tsx
-'use client'; 
+'use client';
 
 import { useStore } from '../../store/useStore';
 import { useState, useEffect } from 'react';
@@ -14,10 +14,10 @@ export default function DailyLogPage() {
   const todayLog = logs.find(l => l.date === today);
 
   const [completedHabits, setCompletedHabits] = useState<string[]>([]);
-  const [extraHabits, setExtraHabits] = useState<string[]>([]);
-  const [newExtra, setNewExtra] = useState('');
-  const [reflection, setReflection] = useState('');
-  const [reframed, setReframed] = useState('');
+  [extraHabits, setExtraHabits] = useState<string[]>([]);
+  [newExtra, setNewExtra] = useState('');
+  [reflection, setReflection] = useState('');
+  [reframed, setReframed] = useState('');
 
   useEffect(() => {
     if (todayLog) {
@@ -61,7 +61,6 @@ export default function DailyLogPage() {
       reframed,
     });
 
-    // Confetti when everything is done
     if (completedHabits.length === habits.length + extraHabits.length && habits.length + extraHabits.length > 0) {
       confetti({
         particleCount: 150,
@@ -77,7 +76,6 @@ export default function DailyLogPage() {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-        {/* Header */}
         <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/30">
           <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-4">
@@ -92,7 +90,7 @@ export default function DailyLogPage() {
               onClick={save}
               className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-bold rounded-2xl shadow-2xl hover:scale-105 transition"
             >
-              Save Log
+              Save & Celebrate
             </button>
           </div>
         </div>
@@ -100,10 +98,10 @@ export default function DailyLogPage() {
         <div className="max-w-5xl mx-auto p-8">
           <div className="text-center mb-12">
             <h2 className="text-5xl font-bold text-gray-800 mb-2">
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
             </h2>
-            {allDone && habits.length + extraHabits.length > 0 && (
-              <div className="flex items-center justify-center gap-3 text-4xl font-black text-green-600">
+            {allDone && (habits.length + extraHabits.length > 0) && (
+              <div className="flex items-center justify-center gap-3 text-4xl font-black text-green-600 mt-6">
                 <Sparkles className="w-12 h-12 animate-pulse" />
                 Perfect Day!
                 <Sparkles className="w-12 h-12 animate-pulse" />
@@ -139,10 +137,7 @@ export default function DailyLogPage() {
             {extraHabits.map((item, i) => {
               const done = completedHabits.includes(`extra-${i}`);
               return (
-                <div
-                  key={i}
-                  className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all border border-white/50 flex items-center gap-6"
-                >
+                <div key={i} className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all border border-white/50 flex items-center gap-6">
                   <button
                     onClick={() => toggleExtra(i)}
                     className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all ${done ? 'bg-purple-500' : 'bg-gray-200'}`}
