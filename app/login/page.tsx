@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
@@ -17,23 +17,14 @@ export default function Login() {
   const [message, setMessage] = useState('');
   const router = useRouter();
 
-  // Redirect if already logged in
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        router.push('/');
-      }
-    };
-    checkSession();
-  }, [router]);
-
   const handleSubmit = async () => {
     setLoading(true);
     setMessage('');
+
     const { error } = isSignUp
       ? await supabase.auth.signUp({ email, password })
       : await supabase.auth.signInWithPassword({ email, password });
+
     if (error) {
       setMessage('Error: ' + error.message);
     } else {
@@ -44,63 +35,47 @@ export default function Login() {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '2rem',
-    }}>
-      <div style={{
-        background: 'white',
-        padding: '3rem',
-        borderRadius: '1.5rem',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-        width: '100%',
-        maxWidth: '420px',
-      }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: '900', textAlign: 'center', marginBottom: '2rem' }}>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 p-4">
+      <div className="bg-white rounded-3xl shadow-2xl p-12 w-full max-w-md">
+        <h1 className="text-4xl font-black text-center mb-10">
           {isSignUp ? 'Create Account' : 'Welcome Back'}
         </h1>
+
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '0.75rem', border: '1px solid #d1d5db' }}
+          className="w-full px-5 py-4 mb-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 outline-none text-lg"
         />
+
         <input
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%', padding: '1rem', marginBottom: '1.5rem', borderRadius: '0.75rem', border: '1px solid #d1d5db' }}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full px-5 py-4 mb-8 rounded-xl border-2 border-gray-200 focus:border-indigo-500 outline-none text-lg"
         />
+
         <button
           onClick={handleSubmit}
           disabled={loading}
-          style={{
-            width: '100%',
-            padding: '1rem',
-            background: '#667eea',
-            color: 'white',
-            borderRadius: '0.75rem',
-            fontWeight: 'bold',
-          }}
+          className="w-full py-5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-xl rounded-xl shadow-xl hover:shadow-2xl transition"
         >
           {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Log In'}
         </button>
-        <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.95rem' }}>
+
+        <p className="text-center mt-8 text-gray-600">
           {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
           <button
             onClick={() => setIsSignUp(!isSignUp)}
-            style={{ color: '#667eea', fontWeight: 'bold', background: 'none', border: 'none', cursor: 'pointer' }}
+            className="text-indigo-600 font-bold hover:underline"
           >
             {isSignUp ? 'Log In' : 'Sign Up'}
           </button>
         </p>
-        {message && <p style={{ color: 'red', textAlign: 'center', marginTop: '1rem' }}>{message}</p>}
+
+        {message && <p className="text-center mt-6 text-red-600">{message}</p>}
       </div>
     </div>
   );
