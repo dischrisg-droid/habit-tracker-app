@@ -1,4 +1,5 @@
 'use client';
+import '../../globals.css';   // ← ADD THIS LINE
 
 import { useStore } from '../../store/useStore';
 import { useState } from 'react';
@@ -278,3 +279,4 @@ export default function HabitsPage() {
     </>
   );
 }
+
