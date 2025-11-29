@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Dummy class to force Vercel rebuild */
+.force-rebuild {
+  @apply bg-red-500 text-white p-4 rounded-lg;
+}
+
+/* Custom components for your app */
+@layer components {
+  .card {
+    @apply bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden;
+  }
+  .btn-gradient {
+    @apply px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all;
+  }
+}
