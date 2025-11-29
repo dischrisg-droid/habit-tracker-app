@@ -26,7 +26,6 @@ module.exports = {
     'p-10',
     'text-4xl',
     'font-bold',
-    // Add any other missing classes here if needed
   ],
   theme: {
     extend: {},
