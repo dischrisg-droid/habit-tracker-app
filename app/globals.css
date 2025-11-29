@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: system-ui, -apple-system, sans-serif;
-  background: #f9fafb;
-  margin: 0;
+/* Force Tailwind to regenerate everything */
+.force-rebuild {
+  @apply bg-red-500; /* dummy class so Vercel sees a change */
 }
