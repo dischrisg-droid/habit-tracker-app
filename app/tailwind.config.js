@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",  // Key for App Router
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",  // Scans your app folder (key for App Router)
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./store/**/*.{js,ts,jsx,tsx,mdx}",
@@ -23,13 +23,13 @@ module.exports = {
     'border-white/50',
     'text-transparent',
     'bg-clip-text',
+    'p-10',
+    'text-4xl',
+    'font-bold',
+    // Add any other missing classes here if needed
   ],
   theme: {
-    extend: {
-      animation: {
-        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      }
-    },
+    extend: {},
   },
   plugins: [],
 };
