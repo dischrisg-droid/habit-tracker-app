@@ -85,8 +85,17 @@ export default function HabitsPage() {
                       {done ? 'Done' : 'Pending'}
                     </span>
                     <div className="flex gap-4">
-                      <button onClick={() => { setEditing(habit); setForm(habit); setShowForm(true); }} className="p-4 bg-indigo-100 rounded-2xl hover:bg-indigo-200">
-                        <Edit2 className="w-7 h-7 text-indigo-700" />
+                      onClick={() => {
+  setEditing(habit);
+  setForm({
+    name: habit.name,
+    frequency: habit.frequency as 'daily' | 'weekly',
+    days: habit.days ?? [],
+    targettime: habit.targettime ?? '',
+    notes: habit.notes ?? '',
+  });
+  setShowForm(true);
+}}
                       </button>
                       <button onClick={() => confirm('Delete?') && saveHabits(habits.filter(h => h.id !== habit.id))} className="p-4 bg-red-100 rounded-2xl hover:bg-red-200">
                         <Trash2 className="w-7 h-7 text-red-600" />
@@ -157,4 +166,5 @@ export default function HabitsPage() {
       )}
     </div>
   );
+
 }
