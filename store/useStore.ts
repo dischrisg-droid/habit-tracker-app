@@ -22,6 +22,7 @@ type DailyLog = {
   completedHabits: string[];
   extraHabits: string[];
   reflection: string;
+  reframed?: string;        // ← make sure this line exists and has the ?
 };
 
 type Personality = {
@@ -89,4 +90,5 @@ export const useStore = create<{
     await supabase.from('personality').upsert({ ...p, user_id: user.id });
     set({ personality: p });
   },
+
 }));
