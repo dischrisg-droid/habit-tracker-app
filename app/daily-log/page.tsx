@@ -1,188 +1,208 @@
 'use client';
 
 import { useStore } from '../../store/useStore';
-import { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { format, addDays, parseISO } from 'date-fns';
+import { Check, X, Plus, ArrowLeft, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import confetti from 'canvas-confetti';
 
 export default function DailyLogPage() {
-  const { user, authLoading, habits, logs, saveLog } = useStore();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!authLoading && !user) router.replace('/login');
-  }, [authLoading, user, router]);
-
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-3xl">
-        Loading...
-      </div>
-    );
-  }
-
+  const { habits, logs, saveLog } = useStore();
+  const [completedHabits, setCompletedHabits] = useState<string[]>([]);
+  const [extraHabits, setExtraHabits] = useState<string[]>([]);
   const [reflection, setReflection] = useState('');
   const [reframed, setReframed] = useState('');
-  const [isLoadingAI, setIsLoadingAI] = useState(false);
-  const [selectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [newHabit, setNewHabit] = useState('');
 
-  const todayLog = useMemo(() => {
-    return logs.find(log => log.date === selectedDate) || {
-      completedHabits: [],
-      extraHabits: [],
-      reflection: '',
-      reframed: '',
-    };
-  }, [logs, selectedDate]);
-
-  const [completedHabits, setCompletedHabits] = useState<string[]>(todayLog.completedHabits || []);
-  const [extraHabits, setExtraHabits] = useState<string[]>(todayLog.extraHabits || []);
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const todayLog = logs.find(l => l.date === today);
 
   useEffect(() => {
-    setCompletedHabits(todayLog.completedHabits || []);
-    setExtraHabits(todayLog.extraHabits || []);
-    setReflection(todayLog.reflection || '');
-    setReframed(todayLog.reframed || '');
+    if (todayLog) {
+      setCompletedHabits(todayLog.completedHabits || []);
+      setExtraHabits(todayLog.extraHabits || []);
+      setReflection(todayLog.reflection || '');
+      setReframed(todayLog.reframed || '');
+    }
   }, [todayLog]);
 
   const handleToggleHabit = (habitId: string) => {
-    setCompletedHabits(prev =>
-      prev.includes(habitId) ? prev.filter(id => id !== habitId) : [...prev, habitId]
+    setCompletedHabits(prev => 
+      prev.includes(habitId) 
+        ? prev.filter(id => id !== habitId)
+        : [...prev, habitId]
     );
   };
 
-  const handleAddExtraHabit = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-      setExtraHabits(prev => [...prev, e.currentTarget.value.trim()]);
-      e.currentTarget.value = '';
+  const addExtraHabit = () => {
+    if (newHabit.trim()) {
+      setExtraHabits(prev => [...prev, newHabit.trim()]);
+      setNewHabit('');
     }
   };
 
-  const handleSaveLog = async () => {
-    if (!reflection.trim()) return;
-    const logData = { date: selectedDate, completedHabits, extraHabits, reflection: reflection.trim(), reframed };
-    try {
-      await saveLog(logData);
-      alert('Log saved!');
-    } catch {
-      alert('Save failed');
+  const removeExtraHabit = (index: number) => {
+    setExtraHabits(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const toggleExtraHabit = (index: number) => {
+    setCompletedHabits(prev => 
+      prev.includes(`extra-${index}`)
+        ? prev.filter(id => id !== `extra-${index}`)
+        : [...prev, `extra-${index}`]
+    );
+  };
+
+  const save = async () => {
+    const log = {
+      date: today,
+      completedHabits,
+      extraHabits,
+      reflection,
+      reframed,
+    };
+    await saveLog(log);
+
+    if (completedHabits.length === habits.length + extraHabits.length) {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
     }
   };
 
-  const handleReframe = () => {
-    if (!reflection.trim()) return;
-    setIsLoadingAI(true);
-    setTimeout(() => {
-      setReframed(`You're doing incredible work. "${reflection}" — that took courage. Keep going.`);
-      setIsLoadingAI(false);
-    }, 1500);
-  };
+  const isComplete = completedHabits.length === habits.length + extraHabits.length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Tiny Back Button */}
-        <div className="mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      <div className="sticky top-0 z-50 bg-white/70 backdrop-blur-lg border-b border-white/50">
+        <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3 text-gray-700 hover:text-gray-900 transition">
+            <ArrowLeft className="w-6 h-6" />
+            <h1 className="text-3xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
+              Daily Log
+            </h1>
+          </Link>
           <button
-            onClick={() => router.push('/')}
-            className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur rounded-full shadow hover:shadow-md transition text-gray-700 text-sm font-medium hover:scale-105"
+            onClick={save}
+            disabled={!isComplete && !reflection}
+            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold shadow-xl hover:shadow-2xl transition disabled:opacity-50"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back
+            {isComplete ? 'Save & Celebrate!' : 'Save Reflection'}
           </button>
         </div>
+      </div>
 
-        <h1 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          Daily Reflection Journal
-        </h1>
-        <p className="text-center text-gray-600 text-lg mb-12">
-          Be honest. The AI will help you reframe it with kindness.
-        </p>
+      <div className="max-w-5xl mx-auto px-6 py-12">
+        <div className="text-center mb-12">
+          <h2 className="text-5xl font-black text-gray-800 mb-4">{format(new Date(), 'EEEE, MMMM do')}</h2>
+          <div className="text-2xl text-gray-600">What did you accomplish today?</div>
+        </div>
 
-        <div className="bg-white/90 backdrop-blur rounded-3xl shadow-2xl p-8 mb-8">
-          <div className="mb-8 text-center">
+        {/* Habits Checklist */}
+        <div className="space-y-6 mb-12">
+          <h3 className="text-3xl font-bold text-indigo-600 mb-6">Today's Habits</h3>
+          {habits.map(habit => {
+            const isDone = completedHabits.includes(habit.id);
+            return (
+              <div key={habit.id} className="bg-white rounded-3xl shadow-xl p-6 flex items-center justify-between hover:shadow-2xl transition">
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => handleToggleHabit(habit.id)}
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+                      isDone
+                        ? 'bg-green-500 text-white shadow-lg'
+                        : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                    }`}
+                  >
+                    {isDone ? <Check className="w-6 h-6" /> : <div className="w-2 h-2 rounded-full bg-gray-400" />}
+                  </button>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-800">{habit.name}</h4>
+                    <p className="text-gray-600">{habit.frequency === 'daily' ? 'Daily' : 'Weekly'} {habit.targettime && `· ${habit.targettime}`}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Extra Habits */}
+        <div className="space-y-4 mb-12">
+          <h3 className="text-3xl font-bold text-purple-600 mb-6">Extra Wins Today</h3>
+          {extraHabits.map((habit, index) => {
+            const isDone = completedHabits.includes(`extra-${index}`);
+            return (
+              <div key={index} className="bg-white rounded-3xl shadow-xl p-6 flex items-center justify-between hover:shadow-2xl transition">
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => toggleExtraHabit(index)}
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+                      isDone
+                        ? 'bg-purple-500 text-white shadow-lg'
+                        : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                    }`}
+                  >
+                    {isDone ? <Check className="w-6 h-6" /> : <div className="w-2 h-2 rounded-full bg-gray-400" />}
+                  </button>
+                  <h4 className="text-xl font-bold text-gray-800 flex-1">{habit}</h4>
+                  <button
+                    onClick={() => removeExtraHabit(index)}
+                    className="p-2 text-red-500 hover:bg-red-100 rounded-2xl transition"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Add Extra Habit */}
+          <div className="bg-white rounded-3xl shadow-xl p-6 flex gap-4">
             <input
-              type="date"
-              value={selectedDate}
-              readOnly
-              className="px-6 py-3 text-lg border-2 border-purple-200 rounded-xl bg-gray-50"
+              placeholder="Add a win, e.g. 'Called mom'"
+              value={newHabit}
+              onChange={e => setNewHabit(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' && addExtraHabit()}
+              className="flex-1 px-4 py-3 rounded-2xl border-2 border-gray-200 focus:border-purple-500 outline-none text-lg"
             />
-          </div>
-
-          <div className="space-y-10">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Completed Habits</h2>
-              <div className="grid gap-3">
-                {habits.map(habit => (
-                  <label key={habit.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
-                    <input
-                      type="checkbox"
-                      checked={completedHabits.includes(habit.id)}
-                      onChange={() => handleToggleHabit(habit.id)}
-                      className="w-6 h-6 accent-purple-600 rounded"
-                    />
-                    <span className="text-lg font-medium">{habit.name}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Extra Wins Today</h2>
-              <input
-                type="text"
-                placeholder="Press Enter to add (e.g., Drank 2L water)"
-                onKeyDown={handleAddExtraHabit}
-                className="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none"
-              />
-              <div className="flex flex-wrap gap-3 mt-4">
-                {extraHabits.map((win, i) => (
-                  <span key={i} className="px-5 py-3 bg-purple-100 text-purple-800 rounded-full font-medium text-sm">
-                    {win}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Reflection</h2>
-              <textarea
-                placeholder="Let it all out — wins, struggles, feelings..."
-                value={reflection}
-                onChange={(e) => setReflection(e.target.value)}
-                rows={10}
-                className="w-full px-6 py-5 text-lg border-2 border-gray-200 rounded-2xl focus:border-purple-500 focus:outline-none resize-none"
-              />
-            </div>
-
-            <div className="text-center">
-              <button
-                onClick={handleReframe}
-                disabled={isLoadingAI || !reflection.trim()}
-                className="px-16 py-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-2xl rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoadingAI ? 'Thinking...' : 'AI Reframe My Day'}
-              </button>
-            </div>
-
-            {reframed && (
-              <div className="p-10 bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl border-2 border-purple-200">
-                <h3 className="text-2xl font-bold text-purple-900 mb-4">AI Reframed Perspective:</h3>
-                <p className="text-xl leading-relaxed text-gray-800 italic">{reframed}</p>
-              </div>
-            )}
-
-            <div className="text-center pt-8">
-              <button
-                onClick={handleSaveLog}
-                className="px-20 py-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-2xl font-bold rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all"
-              >
-                Save Today's Entry
-              </button>
-            </div>
+            <button
+              onClick={addExtraHabit}
+              className="p-3 bg-purple-600 text-white rounded-2xl hover:bg-purple-700 transition"
+            >
+              <Plus className="w-6 h-6" />
+            </button>
           </div>
         </div>
+
+        {/* Reflection */}
+        <div className="space-y-4">
+          <h3 className="text-3xl font-bold text-pink-600 mb-6">Reflection</h3>
+          <textarea
+            placeholder="How do you feel about today? What went well? What can you improve?"
+            value={reflection}
+            onChange={e => setReflection(e.target.value)}
+            rows={6}
+            className="w-full px-6 py-5 rounded-3xl border-2 border-gray-200 focus:border-pink-500 outline-none text-lg resize-none"
+          />
+          <textarea
+            placeholder="Reframed: How can you see this day positively?"
+            value={reframed}
+            onChange={e => setReframed(e.target.value)}
+            rows={3}
+            className="w-full px-6 py-5 rounded-3xl border-2 border-gray-200 focus:border-pink-500 outline-none text-lg resize-none"
+          />
+        </div>
+
+        {isComplete && (
+          <div className="mt-12 text-center">
+            <Sparkles className="w-16 h-16 text-yellow-500 mx-auto mb-4 animate-pulse" />
+            <h3 className="text-4xl font-bold text-green-600 mb-2">Perfect Day!</h3>
+            <p className="text-xl text-gray-600">All habits completed. You're on fire!</p>
+          </div>
+        )}
       </div>
     </div>
   );
