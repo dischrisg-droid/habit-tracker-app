@@ -22,7 +22,7 @@ type DailyLog = {
   completedHabits: string[];
   extraHabits: string[];
   reflection: string;
-  reframed?: string;        // ← make sure this line exists and has the ?
+  reframed?: string;  // This optional field fixes the TypeScript error
 };
 
 type Personality = {
@@ -92,3 +92,4 @@ export const useStore = create<{
   },
 
 }));
+
