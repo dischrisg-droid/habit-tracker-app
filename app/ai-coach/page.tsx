@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — FINAL & BULLETPROOF (NO PRERENDER ERROR)
+// app/ai-coach/page.tsx — FINAL & BULLETPROOF
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -22,17 +22,16 @@ export default function AICoachPage() {
   const [video, setVideo] = useState('');
 
   useEffect(() => {
-    // This runs only in the browser — never during build
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return; // ← prevents any server execution
 
-    if (!personality) {
-      setPlan('Please complete your Personality Profile first.');
+    if (!personality || !habits || !logs) {
+      setPlan('Loading your data...');
       return;
     }
 
-    const todayLog = logs?.[logs.length - 1] || {};
+    const todayLog = logs[logs.length - 1] || {};
     const completed = todayLog.completedHabits?.length || 0;
-    const total = habits?.length || 0;
+    const total = habits.length;
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
     const vision = personality.whoIWantToBe || 'your highest self';
 
@@ -120,6 +119,5 @@ You are becoming magnetic. Keep going.`;
   );
 }
 
-// THIS LINE IS CRITICAL — stops Next.js from prerendering this page
+// THIS IS THE ONLY LINE YOU NEED — stops all prerendering
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
