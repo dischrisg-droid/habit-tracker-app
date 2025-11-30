@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — FINAL & 100% WORKING (NO ERRORS, NO LOADING FOREVER)
+// app/ai-coach/page.tsx — LIVE AI + VALID VIDEOS
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -16,61 +16,71 @@ const faculties = [
   { name: 'Reason', icon: Heart, color: 'from-indigo-500 to-purple-500' },
 ];
 
+// Fresh charisma videos (updated from search results)
+const charismaVideos: Record<string, { name: string; url: string; description: string }> = {
+  INFP: { name: 'Adam Driver', url: 'https://www.youtube.com/watch?v=zwK6Mzm7rvY', description: 'Tony Award nomination discussion — study his introspective presence.' },
+  INFJ: { name: 'Benedict Cumberbatch', url: 'https://www.youtube.com/watch?v=u9uVAIod9T4', description: 'Line-guessing fun — observe his thoughtful pauses and charm.' },
+  INTJ: { name: 'Elon Musk', url: 'https://www.youtube.com/watch?v=gPGZRJDVXcU', description: 'Tesla/politics interview — analyze his visionary delivery.' },
+  ENFP: { name: 'Robin Williams', url: 'https://www.youtube.com/watch?v=uPJTfshToOU', description: 'Parkinson interview — watch his infectious energy and quick wit.' },
+  ENFJ: { name: 'Oprah Winfrey', url: 'https://www.youtube.com/watch?v=WAGUSdZaE6c', description: 'Iconic roles reflection — see her empathetic connection.' },
+  default: { name: 'Tom Hanks', url: 'https://www.youtube.com/watch?v=lVzxRVxIaxQ', description: 'Countenance theory — master of relatable charisma.' },
+};
+
 export default function AICoachPage() {
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('');
+  const [plan, setPlan] = useState('Loading your personalized plan...');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
-    // This runs every time the data changes — guarantees no "Loading forever"
-    if (!personality || !habits || !logs || logs.length === 0) {
-      setPlan('Please save a daily log first or complete your Personality Profile.');
+    if (typeof window === 'undefined') return;
+
+    if (!personality) {
+      setPlan('Please complete your Personality Profile first.');
       return;
     }
 
     const todayLog = logs[logs.length - 1] || {};
     const completed = todayLog.completedHabits?.length || 0;
     const total = habits.length;
-    const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
+    const mbti = personality.mbti?.toUpperCase() || 'DEFAULT';
     const vision = personality.whoIWantToBe || 'your highest self';
 
-    const videoMap: Record<string, { name: string; url: string }> = {
-      INFP: { name: 'Adam Driver', url: 'https://www.youtube.com/watch?v=7k4sQb6mX4g' },
-      INFJ: { name: 'Benedict Cumberbatch', url: 'https://www.youtube.com/watch?v=Qqq1q1lB1cI' },
-      INTJ: { name: 'Elon Musk', url: 'https://www.youtube.com/watch?v=1h1o1oq4x1A' },
-      ENFP: { name: 'Robin Williams', url: 'https://www.youtube.com/watch?v=2y1jP6M2y2Y' },
-      ENFJ: { name: 'Oprah Winfrey', url: 'https://www.youtube.com/watch?v=8tXm2J8g2zE' },
+    // Live AI call (replace with your Grok API key)
+    const getAIPlan = async () => {
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer YOUR_GROK_API_KEY', // Get from https://x.ai/api
+        },
+        body: JSON.stringify({
+          model: 'grok-beta',
+          messages: [
+            {
+              role: 'system',
+              content: `You are a world-class Co-Active coach. Create a tomorrow's plan for ${mbti} ${personality.enneagram || ''} who wants to become "${vision}". They completed ${completed}/${total} habits today. Journal: "${todayLog.reflection || ''}". Reframed: "${todayLog.reframed || ''}". Structure around 6 Higher Faculties: Imagination, Will, Perception, Intuition, Memory, Reason. 1 short activity per faculty. End with 1-2 new habit recommendations. Tone: warm, wise, encouraging.`
+            }
+          ],
+          max_tokens: 300,
+        }),
+      });
+
+      const data = await response.json();
+      const aiResponse = data.choices[0].message.content || 'AI error — try again.';
+
+      setPlan(aiResponse);
+      saveAIPlan?.({
+        date: new Date().toISOString().split('T')[0],
+        plan: aiResponse,
+        video: '',
+      });
     };
-    const videoRec = videoMap[mbti] || { name: 'Tom Hanks', url: 'https://www.youtube.com/watch?v=Rb0h6uMcw2I' };
 
-    const generatedPlan = `
-**Tomorrow belongs to ${mbti} becoming:** "${vision}"
+    getAIPlan();
 
-You completed ${completed}/${total} habits today — proud of you.
-
-**Your 6 Higher Faculties Plan for Tomorrow**
-
-• Imagination — 7-minute visualization of your future self on waking  
-• Will — Do your most important habit first — no negotiation  
-• Perception — 3× tomorrow: fully notice one thing with all senses  
-• Reason — Protect your bedtime like it’s sacred  
-• Memory — Before sleep: write one moment that made you feel alive  
-• Intuition — Follow any body signal within 5 seconds
-
-**Daily Charisma Study**  
-Watch **${videoRec.name}** — study presence, pauses, eye contact:
-${videoRec.url}
-
-You are becoming magnetic. Keep going.`;
-
-    setPlan(generatedPlan.trim());
+    // Charisma video (updated from search)
+    const videoRec = charismaVideos[mbti] || charismaVideos.default;
     setVideo(videoRec.url);
-
-    saveAIPlan?.({
-      date: new Date().toISOString().split('T')[0],
-      plan: generatedPlan.trim(),
-      video: videoRec.url,
-    });
   }, [personality, habits, logs, saveAIPlan]);
 
   return (
@@ -89,17 +99,13 @@ You are becoming magnetic. Keep going.`;
       <div className="max-w-4xl mx-auto p-8">
         <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-12 border border-white/50">
           <pre className="whitespace-pre-wrap font-sans text-lg leading-relaxed text-gray-800">
-            {plan || 'Loading your personalized plan...'}
+            {plan}
           </pre>
 
           {video && (
             <div className="mt-12 text-center">
-              <a
-                href={video}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-4 px-10 py-6 bg-gradient-to-r from-red-500 to-pink-600 text-white text-2xl font-bold rounded-3xl shadow-2xl hover:scale-105 transition"
-              >
+              <a href={video} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-4 px-10 py-6 bg-gradient-to-r from-red-500 to-pink-600 text-white text-2xl font-bold rounded-3xl shadow-2xl hover:scale-105 transition">
                 <PlayCircle className="w-12 h-12" />
                 Watch Today’s Charisma Video
               </a>
@@ -122,5 +128,5 @@ You are becoming magnetic. Keep going.`;
   );
 }
 
-// This stops Next.js from trying to prerender the page
+// Stop prerendering
 export const dynamic = 'force-dynamic';
