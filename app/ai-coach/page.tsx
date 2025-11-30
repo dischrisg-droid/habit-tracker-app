@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — FINAL (INSTANT PLAN + VIDEO)
+// app/ai-coach/page.tsx — FINAL & NO PRERENDER ERROR
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -22,12 +22,13 @@ export default function AICoachPage() {
   const instant = searchParams.get('instant') === 'true';
 
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('');
+  const [plan, setPlan] = useState('Loading your plan...');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
-    if (!personality) {
-      setPlan('Please complete your Personality Profile first.');
+    // This prevents any server-side execution
+    if (!personality || !habits || !logs) {
+      setPlan('Loading your data...');
       return;
     }
 
@@ -51,17 +52,17 @@ export default function AICoachPage() {
 
 You completed ${completed}/${total} habits today — proud of you.
 
-**Your 6 Higher Faculties Plan for Tomorrow**
+**Your 6 Higher Faculties Plan**
 
-• **Imagination** — 7-minute visualization of your future self on waking  
-• **Will** — Do your most important habit first — no negotiation  
-• **Perception** — 3× tomorrow: fully notice one thing with all senses  
-• **Reason** — Protect your bedtime like it’s sacred  
-• **Memory** — Before sleep: write one moment that made you feel alive  
-• **Intuition** — Follow any body signal within 5 seconds
+• Imagination — 7-minute visualization of your future self  
+• Will — Do your most important habit first  
+• Perception — 3× tomorrow: fully notice one thing with all senses  
+• Reason — Protect your bedtime like it’s sacred  
+• Memory — Before sleep: write one moment that made you feel alive  
+• Intuition — Follow any body signal within 5 seconds
 
 **Daily Charisma Study**  
-Watch **${videoRec.name}** — study presence, pauses, eye contact:  
+Watch **${videoRec.name}** — study presence & eye contact:
 ${videoRec.url}
 
 You are becoming magnetic. Keep going.`;
@@ -69,7 +70,7 @@ You are becoming magnetic. Keep going.`;
     setPlan(generatedPlan.trim());
     setVideo(videoRec.url);
 
-    saveAIPlan({
+    saveAIPlan?.({
       date: new Date().toISOString().split('T')[0],
       plan: generatedPlan.trim(),
       video: videoRec.url,
@@ -120,3 +121,6 @@ You are becoming magnetic. Keep going.`;
     </div>
   );
 }
+
+// THIS IS THE KEY — stops Next.js from trying to prerender this page
+export const dynamic = 'force-dynamic';
