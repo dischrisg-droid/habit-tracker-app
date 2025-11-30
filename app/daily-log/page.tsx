@@ -1,9 +1,9 @@
-// app/daily-log/page.tsx — FINAL WORKING VERSION
+// app/daily-log/page.tsx — FINAL: saves properly + AI button
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useState } from 'react';
-import { Check, Sparkles, Flame, User } from 'lucide-react'; // ← Fixed: added Flame & User
+import { Check, Sparkles, Flame, User } from 'lucide-react';
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
 
@@ -13,7 +13,6 @@ export default function DailyLogPage() {
   const today = new Date().toISOString().split('T')[0];
   const todayLog = logs.find(l => l.date === today) || {
     completedHabits: [],
-    extraHabits: [],
     reflection: '',
     reframed: '',
   };
@@ -26,26 +25,22 @@ export default function DailyLogPage() {
     await saveLog({
       date: today,
       completedHabits,
-      extraHabits: [],
       reflection,
       reframed,
     });
 
     if (completedHabits.length === habits.length && habits.length > 0) {
       confetti({
-        particleCount: 200,
-        spread: 70,
+        particleCount: 250,
+        spread: 80,
         origin: { y: 0.6 },
-        colors: ['#6366f1', '#a855f7', '#ec4899'],
+        colors: ['#6366f1', '#a855f7', '#ec4899', '#10b981'],
       });
     }
   };
 
-  const allDone = completedHabits.length === habits.length;
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      {/* Header */}
       <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b">
         <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
           <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
@@ -63,27 +58,19 @@ export default function DailyLogPage() {
       </div>
 
       <div className="max-w-4xl mx-auto p-8 pb-32">
-        {/* Date + Perfect Day */}
         <div className="text-center mb-12">
           <h2 className="text-5xl font-bold text-gray-800 mb-4">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </h2>
-          {allDone && habits.length > 0 && (
-            <div className="text-5xl font-black text-green-600 flex items-center justify-center gap-4">
-              <Sparkles className="w-16 h-16 animate-pulse" />
-              Perfect Day!
-              <Sparkles className="w-16 h-16 animate-pulse" />
-            </div>
-          )}
         </div>
 
-        {/* JOURNALING — TOP PRIORITY */}
+        {/* JOURNALING */}
         <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-12 shadow-2xl mb-12 border border-white/50">
           <h2 className="text-4xl font-black mb-8 text-center bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
             How was your day?
           </h2>
           <textarea
-            placeholder="Write freely — what went well, what didn’t, how you feel, what you learned..."
+            placeholder="Write freely..."
             value={reflection}
             onChange={e => setReflection(e.target.value)}
             rows={12}
@@ -98,9 +85,9 @@ export default function DailyLogPage() {
           />
         </div>
 
-        {/* Quick Habit Checklist */}
+        {/* Quick Habits */}
         {habits.length > 0 && (
-          <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl">
+          <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl mb-12">
             <h3 className="text-3xl font-bold mb-8 text-center">Quick Check</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {habits.map(h => {
@@ -111,9 +98,7 @@ export default function DailyLogPage() {
                     onClick={() => setCompletedHabits(prev =>
                       prev.includes(h.id) ? prev.filter(x => x !== h.id) : [...prev, h.id]
                     )}
-                    className={`p-8 rounded-3xl text-2xl font-bold transition-all ${
-                      done ? 'bg-green-500 text-white shadow-2xl' : 'bg-gray-100 text-gray-700'
-                    }`}
+                    className={`p-8 rounded-3xl text-2xl font-bold transition-all ${done ? 'bg-green-500 text-white shadow-2xl' : 'bg-gray-100'}`}
                   >
                     {done && <Check className="w-12 h-12 mx-auto mb-2" />}
                     {h.name}
@@ -125,7 +110,7 @@ export default function DailyLogPage() {
         )}
 
         {/* Buttons */}
-        <div className="text-center mt-16 space-y-8">
+        <div className="text-center space-y-8">
           <button
             onClick={save}
             className="px-20 py-8 text-4xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl shadow-2xl hover:scale-110 transition"
@@ -133,14 +118,12 @@ export default function DailyLogPage() {
             Save Today
           </button>
 
-          <div>
-            <Link href="/ai-coach">
-              <button className="px-12 py-5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xl font-bold rounded-2xl shadow-xl hover:scale-105 transition flex items-center gap-4 mx-auto">
-                <Sparkles className="w-8 h-8" />
-                Get Tomorrow’s Plan from Your AI Coach
-              </button>
-            </Link>
-          </div>
+          <Link href="/ai-coach">
+            <button className="px-16 py-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-2xl font-bold rounded-3xl shadow-2xl hover:scale-105 transition flex items-center gap-4 mx-auto">
+              <Sparkles className="w-10 h-10" />
+              Get Tomorrow’s Plan + Charisma Video
+            </button>
+          </Link>
         </div>
       </div>
     </div>
