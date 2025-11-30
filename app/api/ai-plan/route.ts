@@ -1,8 +1,8 @@
-// app/api/ai-plan/route.ts — SERVERock CORS & works 100%
+// app/api/ai-plan/route.ts — FINAL & 100% WORKING
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const { messages } = await request.json();
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     },
     body: JSON.stringify({
       model: 'gpt-4o-mini',
-      messages: body.messages,
+      messages,
       max_tokens: 500,
       temperature: 0.8,
     }),
