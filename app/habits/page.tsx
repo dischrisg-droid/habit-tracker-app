@@ -115,7 +115,11 @@ export default function HabitsPage() {
             </h1>
           </Link>
           <button
-            onClick={() => { setEditing(null); setForm({ name: '', frequency: 'daily', days: [], targettime: '', notes: '' }); setShowForm(true); }}
+            onClick={() => {
+              setEditing(null);
+              setForm({ name: '', frequency: 'daily', days: [], targettime: '', notes: '' });
+              setShowForm(true);
+            }}
             className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:scale-105 transition flex items-center gap-3"
           >
             <Plus className="w-7 h-7" /> New Habit
@@ -158,7 +162,7 @@ export default function HabitsPage() {
                   </div>
                 </div>
 
-                {/* Calendar with letters above */}
+                {/* Calendar with S M T W T F S above */}
                 <div className="p-6">
                   {/* Day letters */}
                   <div className="grid grid-cols-7 gap-1.5 mb-3">
@@ -198,7 +202,7 @@ export default function HabitsPage() {
         </div>
       </div>
 
-      {/* Modal — keep your current one */}
+      {/* Your modal — keep the one you already have */}
       {showForm && (
         // ... your full modal code from before ...
       )}
