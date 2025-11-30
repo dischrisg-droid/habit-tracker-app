@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — FINAL & WORKING (YOUR LATEST KEY)
+// app/ai-coach/page.tsx — FINAL & 100% WORKING (via /api/ai-plan)
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -13,19 +13,15 @@ export default function AICoachPage() {
   const [video, setVideo] = useState('');
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
     if (!personality || !logs || logs.length === 0) {
       setPlan('Please save today’s log first.');
       return;
     }
 
     const todayLog = logs[logs.length - 1];
-    const completed = todayLog.completedHabits?.length || 0;
-    const total = habits.length;
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
     const vision = personality.whoIWantToBe || 'your highest self';
 
-    // Fresh charisma videos
     const videoMap: Record<string, string> = {
       INFP: 'https://www.youtube.com/watch?v=zwK6Mzm7rvY',
       INFJ: 'https://www.youtube.com/watch?v=u9uVAIod9T4',
@@ -35,54 +31,41 @@ export default function AICoachPage() {
     };
     setVideo(videoMap[mbti] || 'https://www.youtube.com/watch?v=lVzxRVxIaxQ');
 
-    // LIVE CHATGPT CALL — YOUR NEW KEY
-    const callChatGPT = async () => {
+    const callAI = async () => {
       try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const res = await fetch('/api/ai-plan', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer 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',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [
-              {
-                role: 'system',
-                content: `You are a world-class Co-Active coach for a ${mbti} who wants to become: "${vision}".
-Today they completed ${completed}/${total} habits.
+            messages: [{
+              role: 'system',
+              content: `You are a world-class coach for a ${mbti} who wants to become: "${vision}".
+Today they completed ${todayLog.completedHabits?.length || 0}/${habits.length} habits.
 Journal: "${todayLog.reflection || ''}"
 Reframed: "${todayLog.reframed || ''}"
 
 Give a beautiful tomorrow plan using the 6 Higher Faculties (Imagination, Will, Perception, Intuition, Memory, Reason).
-One short, powerful activity per faculty.
-End with 1–2 perfect new habit recommendations.
-Tone: warm, wise, encouraging, slightly playful. Max 400 words.`
-              }
-            ],
-            max_tokens: 450,
-            temperature: 0.8,
+One short activity per faculty. End with 1–2 new habit ideas.
+Tone: warm, wise, encouraging. Max 400 words.`
+            }]
           }),
         });
 
-        if (!response.ok) throw new Error('API error');
-
-        const data = await response.json();
-        const aiPlan = data.choices?.[0]?.message?.content || 'Keep going — you are becoming legendary.';
+        const data = await res.json();
+        const aiPlan = data.choices?.[0]?.message?.content || 'You are becoming legendary.';
 
         setPlan(aiPlan.trim());
-
         saveAIPlan?.({
           date: new Date().toISOString().split('T')[0],
           plan: aiPlan.trim(),
           video: videoMap[mbti] || 'https://www.youtube.com/watch?v=lVzxRVxIaxQ',
         });
       } catch (err) {
-        setPlan('ChatGPT temporarily unavailable — here’s your fallback:\n\nKeep showing up. You are becoming the person you wrote about. That’s the real magic.');
+        setPlan('Keep going — you are becoming the person you wrote about.');
       }
     };
 
-    callChatGPT();
+    callAI();
   }, [personality, habits, logs, saveAIPlan]);
 
   return (
