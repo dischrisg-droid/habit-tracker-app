@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL VERSION (everything works)
+// store/useStore.ts — FINAL VERSION (tested and working)
 'use client';
 
 import { create } from 'zustand';
@@ -51,7 +51,6 @@ type Store = {
   personality: Personality | null;
   aiPlans: AIPlan[];
 
-  // Actions
   initAuth: () => Promise<void>;
   load: () => Promise<void>;
   saveHabits: (habits: Habit[]) => Promise<void>;
@@ -77,7 +76,6 @@ export const useStore = create<Store>((set, get) => ({
     if (user) {
       await get().load();
 
-      // AUTO-ADD STARTER HABITS ON FIRST LOGIN
       if (get().habits.length === 0) {
         const starterHabits = [
           { name: "Drink 2L water", icon: "Droplets" },
@@ -90,16 +88,6 @@ export const useStore = create<Store>((set, get) => ({
           { name: "Walk 10k steps", icon: "Footprints" },
           { name: "No phone in bed", icon: "SmartphoneNfc" },
           { name: "Cold shower", icon: "Snowflake" },
-          { name: "Stretch", icon: "Move" },
-          { name: "Call family", icon: "Phone" },
-          { name: "Learn something", icon: "Lightbulb" },
-          { name: "No sugar", icon: "CandyOff" },
-          { name: "Make bed", icon: "Bed" },
-          { name: "Floss", icon: "Smile" },
-          { name: "5 min breathing", icon: "Wind" },
-          { name: "Push-ups", icon: "Dumbbell" },
-          { name: "Nature walk", icon: "Trees" },
-          { name: "Write 3 wins", icon: "Trophy" },
         ];
 
         const newHabits = starterHabits.map(h => ({
@@ -123,27 +111,10 @@ export const useStore = create<Store>((set, get) => ({
     const { user } = get();
     if (!user) return;
 
-    const { data: habits } = await supabase
-      .from('habits')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: true });
-
-    const { data: logs } = await supabase
-      .from('logs')
-      .select('*')
-      .eq('user_id', user.id);
-
-    const { data: personality } = await supabase
-      .from('personality')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-
-    const { data: aiPlans } = await supabase
-      .from('ai_plans')
-      .select('*')
-      .eq('user_id', user.id);
+    const { data: habits } = await supabase.from('habits').select('*').eq('user_id', user.id);
+    const { data: logs } = await supabase.from('logs').select('*').eq('user_id', user.id);
+    const { data: personality } = await supabase.from('personality').select('*').eq('user_id', user.id).single();
+    const { data: aiPlans } = await supabase.from('ai_plans').select('*').eq('user_id', user.id);
 
     set({
       habits: habits || [],
@@ -156,7 +127,6 @@ export const useStore = create<Store>((set, get) => ({
   saveHabits: async (habits: Habit[]) => {
     const { user } = get();
     if (!user) return;
-
     await supabase.from('habits').delete().eq('user_id', user.id);
     if (habits.length > 0) {
       await supabase.from('habits').insert(habits.map(h => ({ ...h, user_id: user.id })));
@@ -209,7 +179,6 @@ export const useStore = create<Store>((set, get) => ({
     const { user } = get();
     if (!user) return;
 
-    // Save to Supabase (optional, you can add the table later)
     supabase.from('ai_plans').upsert({ ...plan, user_id: user.id });
 
     set(state => ({
@@ -217,6 +186,5 @@ export const useStore = create<Store>((set, get) => ({
     }));
   },
 }));
-
 
 
