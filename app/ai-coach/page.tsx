@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — LIVE GROK AI + YOUR API KEY
+// app/ai-coach/page.tsx — LIVE CHATGPT (gpt-4o) + YOUR KEY
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -18,7 +18,7 @@ const faculties = [
 
 export default function AICoachPage() {
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('Generating your personalized plan with Grok...');
+  const [plan, setPlan] = useState('Generating your personalized plan with ChatGPT...');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
@@ -29,6 +29,8 @@ export default function AICoachPage() {
     }
 
     const todayLog = logs[logs.length - 1];
+    const completed = todayLog.completedHabits?.length || 0;
+    const total = habits.length;
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
     const vision = personality.whoIWantToBe || 'your highest self';
 
@@ -43,38 +45,38 @@ export default function AICoachPage() {
     const videoRec = videoMap[mbti] || { name: 'Tom Hanks', url: 'https://www.youtube.com/watch?v=lVzxRVxIaxQ' };
     setVideo(videoRec.url);
 
-    // LIVE GROK API CALL
-    const callGrok = async () => {
+    // LIVE CHATGPT CALL (gpt-4o)
+    const callChatGPT = async () => {
       try {
-        const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer xai-VHH7AsnitnZiGm7kfRCRZDntoQuKwKQIzmTIWoMKk3EVahCe40ZomzxkB0AQeawIeVtsO3WzzuODTA7d',
+            'Authorization': 'Bearer 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',
           },
           body: JSON.stringify({
-            model: 'grok-beta',
+            model: 'gpt-4o',
             messages: [
               {
                 role: 'system',
-                content: `You are a world-class Co-Active coach for a ${mbti} who wants to become: "${vision}". 
-They completed ${todayLog.completedHabits?.length || 0}/${habits.length} habits today.
-Journal: "${todayLog.reflection || 'none'}"
+                content: `You are a world-class Co-Active coach for a ${mbti} (${personality.enneagram || 'unknown Enneagram'}) who wants to become: "${vision}".
+Today they completed ${completed}/${total} habits.
+Journal entry: "${todayLog.reflection || 'none'}"
 Reframed: "${todayLog.reframed || 'none'}"
 
-Give a beautiful tomorrow plan using the 6 Higher Faculties: Imagination, Will, Perception, Intuition, Memory, Reason.
+Give a beautiful, inspiring tomorrow plan using exactly the 6 Higher Faculties: Imagination, Will, Perception, Intuition, Memory, Reason.
 One short, powerful activity per faculty.
-End with 1–2 new habit suggestions that fit them perfectly.
-Tone: warm, wise, encouraging, slightly playful.`
+End with 1–2 perfect new habit recommendations.
+Tone: warm, wise, encouraging, slightly playful. Max 400 words.`
               }
             ],
-            max_tokens: 400,
-            temperature: 0.8,
+            max_tokens: 500,
+            temperature: 0.85,
           }),
         });
 
         const data = await response.json();
-        const aiResponse = data.choices?.[0]?.message?.content || 'Grok is thinking...';
+        const aiResponse = data.choices?.[0]?.message?.content || 'ChatGPT is thinking...';
 
         setPlan(aiResponse.trim());
         saveAIPlan?.({
@@ -83,11 +85,11 @@ Tone: warm, wise, encouraging, slightly playful.`
           video: videoRec.url,
         });
       } catch (error) {
-        setPlan('AI temporarily unavailable — using fallback plan.\n\nKeep going — you are becoming legendary.');
+        setPlan('ChatGPT temporarily unavailable — keep going, you are becoming legendary.');
       }
     };
 
-    callGrok();
+    callChatGPT();
   }, [personality, habits, logs, saveAIPlan]);
 
   return (
@@ -98,7 +100,7 @@ Tone: warm, wise, encouraging, slightly playful.`
             <ArrowLeft className="w-7 h-7 text-white" />
           </Link>
           <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
-            Your AI Coach (Live with Grok)
+            Your AI Coach (Live with ChatGPT)
           </h1>
         </div>
       </div>
