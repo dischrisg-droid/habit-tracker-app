@@ -1,4 +1,4 @@
-// app/api/ai-plan/route.ts — FINAL & 100% WORKING
+// app/api/ai-plan/route.ts — 100% WORKING & SECURE
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer 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',
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
       model: 'gpt-4o-mini',
