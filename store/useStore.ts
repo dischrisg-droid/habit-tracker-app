@@ -63,7 +63,7 @@ initAuth: async () => {
   if (user) {
     await get().load();
 
-    // FIRST-TIME USER? Add beautiful starter habits silently
+    // AUTO-ADD 20 STARTER HABITS ON FIRST LOGIN ONLY
     if (get().habits.length === 0) {
       const starterHabits = [
         { name: "Drink 2L water", icon: "Droplets" },
@@ -141,6 +141,7 @@ initAuth: async () => {
     set({ personality: p });
   },
 }));
+
 
 
 
