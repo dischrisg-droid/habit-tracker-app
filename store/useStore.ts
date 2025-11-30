@@ -53,17 +53,56 @@ export const useStore = create<{
   logs: [],
   personality: null,
 
-  initAuth: async () => {
-    set({ authLoading: true });
-    const { data: { session } } = await supabase.auth.getSession();
-    set({ user: session?.user ?? null, authLoading: false });
-    if (session?.user) await get().load();
+initAuth: async () => {
+  set({ authLoading: true });
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
+  set({ user, authLoading: false });
 
-    supabase.auth.onAuthStateChange((_, session) => {
-      set({ user: session?.user ?? null });
-      if (session?.user) get().load();
-    });
-  },
+  if (user) {
+    await get().load();
+
+    // FIRST-TIME USER? Add beautiful starter habits silently
+    if (get().habits.length === 0) {
+      const starterHabits = [
+        { name: "Drink 2L water", icon: "Droplets" },
+        { name: "Meditate", icon: "Brain" },
+        { name: "Exercise", icon: "Dumbbell" },
+        { name: "Read", icon: "BookOpen" },
+        { name: "Sleep 8h", icon: "Moon" },
+        { name: "Journal", icon: "Pen" },
+        { name: "Gratitude", icon: "Heart" },
+        { name: "Walk 10k steps", icon: "Footprints" },
+        { name: "No phone in bed", icon: "SmartphoneNfc" },
+        { name: "Cold shower", icon: "Snowflake" },
+        { name: "Stretch", icon: "Move" },
+        { name: "Call family", icon: "Phone" },
+        { name: "Learn something", icon: "Lightbulb" },
+        { name: "No sugar", icon: "CandyOff" },
+        { name: "Make bed", icon: "Bed" },
+        { name: "Floss", icon: "Smile" },
+        { name: "5 min breathing", icon: "Wind" },
+        { name: "Push-ups", icon: "Arm" },
+        { name: "Nature walk", icon: "Trees" },
+        { name: "Write 3 wins", icon: "Trophy" },
+      ];
+
+      const newHabits = starterHabits.map(h => ({
+        id: crypto.randomUUID(),
+        name: h.name,
+        frequency: 'daily' as const,
+        icon: h.icon,
+      }));
+
+      await get().saveHabits(newHabits);
+    }
+  }
+
+  supabase.auth.onAuthStateChange((_, session) => {
+    set({ user: session?.user ?? null });
+    if (session?.user) get().load();
+  });
+},
 
   load: async () => {
     const { user } = get();
@@ -101,5 +140,6 @@ export const useStore = create<{
     set({ personality: p });
   },
 }));
+
 
 
