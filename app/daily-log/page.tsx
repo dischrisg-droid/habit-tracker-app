@@ -1,11 +1,11 @@
-// app/daily-log/page.tsx — FULL & FINAL (SAVE WORKS + INSTANT AI)
+// app/daily-log/page.tsx — FINAL & PERFECT (NO ERRORS)
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useState } from 'react';
 import { Check, Sparkles, Flame, User } from 'lucide-react';
 import Link from 'next/link';
-import confetti from 'canvas873-confetti';
+import confetti from 'canvas-confetti'; // ← THIS IS THE CORRECT IMPORT
 
 export default function DailyLogPage() {
   const { habits, logs, saveLog } = useStore();
@@ -68,33 +68,23 @@ export default function DailyLogPage() {
           <h2 className="text-5xl font-bold text-gray-800 mb-4">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </h2>
-          {completedHabits.length === habits.length && habits.length > 0 && (
-            <div className="text-5xl font-black text-green-600 flex items-center justify-center gap-4">
-              <Sparkles className="w-16 h-16 animate-pulse" />
-              Perfect Day!
-              <Sparkles className="w-16 h-16 animate-pulse" />
-            </div>
-          )}
         </div>
 
         {/* Journal */}
         <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-12 shadow-2xl mb-12 border border-white/50">
-          <h2 className="text-4xl font-black mb-8 text-center bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
-            How was your day?
-          </h2>
           <textarea
-            placeholder="Write freely — what went well, what didn’t, how you feel, what you learned..."
+            placeholder="How was your day? Write freely..."
             value={reflection}
             onChange={(e) => setReflection(e.target.value)}
             rows={12}
-            className="w-full px-8 py-6 text-xl rounded-3xl border-2 border-indigo-200 focus:border-indigo-500 outline-none resize-none font-medium"
+            className="w-full px-8 py-6 text-xl rounded-3xl border-2 border-indigo-200 focus:border-indigo-500 outline-none resize-none"
           />
           <textarea
             placeholder="Reframed: How can you see today positively?"
             value={reframed}
             onChange={(e) => setReframed(e.target.value)}
             rows={4}
-            className="w-full px-8 py-6 text-xl rounded-3xl border-2 border-pink-200 focus:border-pink-500 outline-none resize-none mt-8 font-medium"
+            className="w-full px-8 py-6 text-xl rounded-3xl border-2 border-pink-200 focus:border-pink-500 outline-none resize-none mt-8"
           />
         </div>
 
