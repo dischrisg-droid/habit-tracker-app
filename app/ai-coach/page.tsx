@@ -1,8 +1,9 @@
-// app/ai-coach/page.tsx — FINAL, BEAUTIFUL & WORKING
+// app/ai-coach/page.tsx — FINAL (INSTANT PLAN + VIDEO)
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Sparkles, Brain, Heart, Eye, MessageCircle, Target, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -17,12 +18,18 @@ const faculties = [
 ];
 
 export default function AICoachPage() {
+  const searchParams = useSearchParams();
+  const instant = searchParams.get('instant') === 'true';
+
   const { personality, habits, logs, saveAIPlan } = useStore();
   const [plan, setPlan] = useState('');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
-    if (!personality) return;
+    if (!personality) {
+      setPlan('Please complete your Personality Profile first.');
+      return;
+    }
 
     const todayLog = logs[logs.length - 1] || {};
     const completed = todayLog.completedHabits?.length || 0;
@@ -35,35 +42,36 @@ export default function AICoachPage() {
       INFJ: { name: 'Benedict Cumberbatch', url: 'https://www.youtube.com/watch?v=Qqq1q1lB1cI' },
       INTJ: { name: 'Elon Musk', url: 'https://www.youtube.com/watch?v=1h1o1oq4x1A' },
       ENFP: { name: 'Robin Williams', url: 'https://www.youtube.com/watch?v=2y1jP6M2y2Y' },
+      ENFJ: { name: 'Oprah Winfrey', url: 'https://www.youtube.com/watch?v=8tXm2J8g2zE' },
     };
     const videoRec = videoMap[mbti] || { name: 'Tom Hanks', url: 'https://www.youtube.com/watch?v=Rb0h6uMcw2I' };
 
-    const planText = `
-Tomorrow belongs to **${mbti}** becoming: "${vision}"
+    const generatedPlan = `
+**Tomorrow belongs to ${mbti} becoming:** "${vision}"
 
 You completed ${completed}/${total} habits today — proud of you.
 
-**Your 6 Higher Faculties Plan**
+**Your 6 Higher Faculties Plan for Tomorrow**
 
-Imagination → 7-minute future-self visualization on waking  
-Will → Do your most important habit first — no negotiation  
-Perception → 3× tomorrow: fully notice one thing with all senses  
-Reason → Protect your ${personality.bedTime || 'bedtime'} like it’s sacred  
-Memory → Before sleep: write one moment that made you feel alive  
-Intuition → Follow any body signal within 5 seconds
+• **Imagination** — 7-minute visualization of your future self on waking  
+• **Will** — Do your most important habit first — no negotiation  
+• **Perception** — 3× tomorrow: fully notice one thing with all senses  
+• **Reason** — Protect your bedtime like it’s sacred  
+• **Memory** — Before sleep: write one moment that made you feel alive  
+• **Intuition** — Follow any body signal within 5 seconds
 
 **Daily Charisma Study**  
-Watch **${videoRec.name}** — study presence, pauses, eye contact:
+Watch **${videoRec.name}** — study presence, pauses, eye contact:  
 ${videoRec.url}
 
 You are becoming magnetic. Keep going.`;
 
-    setPlan(planText.trim());
+    setPlan(generatedPlan.trim());
     setVideo(videoRec.url);
 
     saveAIPlan({
       date: new Date().toISOString().split('T')[0],
-      plan: planText.trim(),
+      plan: generatedPlan.trim(),
       video: videoRec.url,
     });
   }, [personality, habits, logs, saveAIPlan]);
@@ -84,7 +92,7 @@ You are becoming magnetic. Keep going.`;
       <div className="max-w-4xl mx-auto p-8">
         <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-12 border border-white/50">
           <pre className="whitespace-pre-wrap font-sans text-lg leading-relaxed text-gray-800">
-            {plan || 'Complete today’s log to unlock your plan'}
+            {plan}
           </pre>
 
           {video && (
