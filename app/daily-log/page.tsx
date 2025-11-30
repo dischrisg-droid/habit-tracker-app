@@ -109,6 +109,14 @@ export default function DailyLogPage() {
           >
             Save Today
           </button>
+          <div className="text-center mt-8">
+  <Link href="/ai-coach">
+    <button className="px-12 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xl font-bold rounded-2xl shadow-xl hover:scale-105 transition flex items-center gap-3 mx-auto">
+      <Sparkles className="w-6 h-6" />
+      Get Tomorrow’s Plan from Your AI Coach
+    </button>
+  </Link>
+</div>
         </div>
       </div>
     </div>
