@@ -6,12 +6,19 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
-  const { user, authLoading } = useStore();
+  const { user, authLoading, habits } = useStore();
   const router = useRouter();
 
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
   }, [authLoading, user, router]);
+
+  // First-time user? Send to onboarding
+  useEffect(() => {
+    if (user && habits.length === 0) {
+      router.replace('/onboarding');
+    }
+  }, [user, habits, router]);
 
   if (authLoading || !user) {
     return (
@@ -31,19 +38,19 @@ export default function HomePage() {
 
         <div className="grid md:grid-cols-3 gap-10">
           <Link href="/habits" className="group">
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-16 shadow-2xl hover:shadow-3xl hover:-translate-y-6 transition-all duration-500 border border-white/50 h-48 flex items-center justify-center">
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-16 shadow-2xl hover:shadow-3xl hover:-translate-y-6 transition-all duration-500 border border-white/50 h-64 flex items-center justify-center flex">
               <h2 className="text-5xl font-black text-indigo-600 group-hover:scale-110 transition">My Habits</h2>
             </div>
           </Link>
 
           <Link href="/daily-log" className="group">
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-16 shadow-2xl hover:shadow-3xl hover:-translate-y-6 transition-all duration-500 border border-white/50 h-48 flex items-center justify-center">
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-16 shadow-2xl hover:shadow-3xl hover:-translate-y-6 transition-all duration-500 border border-white/50 h-64 items-center justify-center flex">
               <h2 className="text-5xl font-black text-purple-600 group-hover:scale-110 transition">Daily Log</h2>
             </div>
           </Link>
 
           <Link href="/personality" className="group">
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-16 shadow-2xl hover:shadow-3xl hover:-translate-y-6 transition-all duration-500 border border-white/50 h-48 flex items-center justify-center">
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-16 shadow-2xl hover:shadow-3xl hover:-translate-y-6 transition-all duration-500 border border-white/50 h-64 items-center justify-center flex">
               <h2 className="text-5xl font-black text-pink-600 group-hover:scale-110 transition">Personality</h2>
             </div>
           </Link>
@@ -52,3 +59,4 @@ export default function HomePage() {
     </div>
   );
 }
+
