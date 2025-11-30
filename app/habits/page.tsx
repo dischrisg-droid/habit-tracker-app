@@ -1,14 +1,24 @@
-// app/habits/page.tsx — FINAL VERSION (works perfectly)
+// app/habits/page.tsx — FINAL WORKING VERSION
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, ArrowLeft, Flame, Check } from 'lucide-react';
+import { 
+  Plus, Edit2, Trash2, ArrowLeft, Flame, Check,
+  Droplets, Brain, Dumbbell, BookOpen, Moon, Pen, Heart, Footprints,
+  SmartphoneNfc, Snowflake, Move, Phone, Lightbulb, CandyOff, Bed,
+  Smile, Wind, Trees, Trophy
+} from 'lucide-react';
 import Link from 'next/link';
-import * as lucideIcons from 'lucide-react';
+
+const iconMap: Record<string, any> = {
+  Droplets, Brain, Dumbbell, BookOpen, Moon, Pen, Heart, Footprints,
+  SmartphoneNfc, Snowflake, Move, Phone, Lightbulb, CandyOff, Bed,
+  Smile, Wind, Trees, Trophy
+};
 
 export default function HabitsPage() {
-  const { habits, logs, saveHabits, saveLog } = useStore(); // ← saveLog was missing!
+  const { habits, logs, saveHabits, saveLog } = useStore();
 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
@@ -79,7 +89,6 @@ export default function HabitsPage() {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-        {/* Header */}
         <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/30">
           <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-4">
@@ -120,16 +129,13 @@ export default function HabitsPage() {
               {habits.map((habit) => {
                 const streak = getStreak(habit.id);
                 const isDone = todayLog?.completedHabits.includes(habit.id);
-                const Icon = habit.icon && lucideIcons[habit.icon as keyof typeof lucideIcons]
-                  ? lucideIcons[habit.icon as keyof typeof lucideIcons]
-                  : Flame;
+                const IconComponent = habit.icon ? iconMap[habit.icon] || Flame : Flame;
 
                 return (
                   <div
                     key={habit.id}
                     className="group relative bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-5 hover:shadow-2xl hover:-translate-y-3 transition-all duration-300"
                   >
-                    {/* Giant Fire Badge */}
                     {streak > 0 && (
                       <div className="absolute -top-5 -right-5 z-10">
                         <div className="relative">
@@ -146,7 +152,7 @@ export default function HabitsPage() {
                         onClick={() => toggleHabit(habit.id)}
                         className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${isDone ? 'bg-green-500 text-white shadow-lg' : 'bg-gray-100'}`}
                       >
-                        {isDone ? <Check className="w-8 h-8" /> : <Icon className="w-8 h-8 text-gray-600" />}
+                        {isDone ? <Check className="w-8 h-8" /> : <IconComponent className="w-8 h-8 text-gray-600" />}
                       </button>
 
                       <div className="flex-1 min-w-0">
@@ -170,7 +176,6 @@ export default function HabitsPage() {
           )}
         </div>
 
-        {/* Modal — keep your existing one or use this simplified version */}
         {showForm && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex items-center justify-center p-6 z-50">
             <div className="bg-white rounded-3xl shadow-3xl p-12 max-w-2xl w-full">
