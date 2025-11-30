@@ -1,9 +1,8 @@
-// app/ai-coach/page.tsx — FINAL & NO PRERENDER ERROR
+// app/ai-coach/page.tsx — FINAL & BULLETPROOF (NO PRERENDER ERROR)
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { Sparkles, Brain, Heart, Eye, MessageCircle, Target, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -18,23 +17,22 @@ const faculties = [
 ];
 
 export default function AICoachPage() {
-  const searchParams = useSearchParams();
-  const instant = searchParams.get('instant') === 'true';
-
   const { personality, habits, logs, saveAIPlan } = useStore();
   const [plan, setPlan] = useState('Loading your plan...');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
-    // This prevents any server-side execution
-    if (!personality || !habits || !logs) {
-      setPlan('Loading your data...');
+    // This runs only in the browser — never during build
+    if (typeof window === 'undefined') return;
+
+    if (!personality) {
+      setPlan('Please complete your Personality Profile first.');
       return;
     }
 
-    const todayLog = logs[logs.length - 1] || {};
+    const todayLog = logs?.[logs.length - 1] || {};
     const completed = todayLog.completedHabits?.length || 0;
-    const total = habits.length;
+    const total = habits?.length || 0;
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
     const vision = personality.whoIWantToBe || 'your highest self';
 
@@ -122,5 +120,6 @@ You are becoming magnetic. Keep going.`;
   );
 }
 
-// THIS IS THE KEY — stops Next.js from trying to prerender this page
+// THIS LINE IS CRITICAL — stops Next.js from prerendering this page
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
