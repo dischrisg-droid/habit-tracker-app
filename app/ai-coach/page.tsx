@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — FINAL & WORKS 100% (even after saving today)
+// app/ai-coach/page.tsx — FINAL & WORKS 100%
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -9,26 +9,19 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function AICoachPage() {
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('Generating your plan...');
+  const [plan, setPlan] = useState('Generating your personalized plan...');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
-    // This runs every time logs/personality change
-    if (!personality) {
-      setPlan('Please complete your Personality Profile first.');
-      return;
-    }
-
-    if (!logs || logs.length === 0) {
+    if (!personality || !logs || logs.length === 0) {
       setPlan('Please save today’s log first.');
       return;
     }
 
-    const todayLog = logs[logs.length - 1]; // latest log
+    const todayLog = logs[logs.length - 1];
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
     const vision = personality.whoIWantToBe || 'your highest self';
 
-    // Fresh videos
     const videoMap: Record<string, string> = {
       INFP: 'https://www.youtube.com/watch?v=zwK6Mzm7rvY',
       INFJ: 'https://www.youtube.com/watch?v=u9uVAIod9T4',
@@ -45,13 +38,13 @@ export default function AICoachPage() {
         body: JSON.stringify({
           messages: [{
             role: 'system',
-            content: `You are a world-class coach for a ${mbti} who wants to become: "${vision}".
+            content: `You are a world-class Co-Active coach for a ${mbti} who wants to become: "${vision}".
 Today they completed ${todayLog.completedHabits?.length || 0}/${habits.length} habits.
 Journal: "${todayLog.reflection || 'none'}"
 Reframed: "${todayLog.reframed || 'none'}"
 
 Give a beautiful tomorrow plan using the 6 Higher Faculties (Imagination, Will, Perception, Intuition, Memory, Reason).
-One short activity per faculty.
+One short, powerful activity per faculty.
 End with 1–2 perfect new habit ideas.
 Tone: warm, wise, encouraging, slightly playful. Max 400 words.`
           }]
@@ -70,7 +63,7 @@ Tone: warm, wise, encouraging, slightly playful. Max 400 words.`
     };
 
     callAI();
-  }, [personality, habits, logs, saveAIPlan]); // ← This line was the fix
+  }, [personality, habits, logs, saveAIPlan]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
