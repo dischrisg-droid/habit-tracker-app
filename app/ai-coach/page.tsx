@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — FINAL & 100% WORKING (FULL PLANS)
+// app/ai-coach/page.tsx — FINAL & SHOWS REAL PLAN
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -9,7 +9,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function AICoachPage() {
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('Generating your personalized plan...');
+  const [plan, setPlan] = useState('Generating your plan...');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
@@ -22,7 +22,6 @@ export default function AICoachPage() {
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
     const vision = personality.whoIWantToBe || 'your highest self';
 
-    // Fresh videos
     const videoMap: Record<string, string> = {
       INFP: 'https://www.youtube.com/watch?v=zwK6Mzm7rvY',
       INFJ: 'https://www.youtube.com/watch?v=u9uVAIod9T4',
@@ -38,37 +37,35 @@ export default function AICoachPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: [
-              {
-                role: 'system',
-                content: `You are a world-class Co-Active coach for a ${mbti} who wants to become: "${vision}".
+            messages: [{
+              role: 'system',
+              content: `You are a world-class coach for a ${mbti} who wants to become: "${vision}".
 Today they completed ${todayLog.completedHabits?.length || 0}/${habits.length} habits.
 Journal: "${todayLog.reflection || 'none'}"
 Reframed: "${todayLog.reframed || 'none'}"
 
 Give a beautiful tomorrow plan using the 6 Higher Faculties (Imagination, Will, Perception, Intuition, Memory, Reason).
-One short, powerful activity per faculty.
-End with 1–2 perfect new habit ideas.
-Tone: warm, wise, encouraging, slightly playful. Max 400 words.`,
-              },
-            ],
+One short activity per faculty. End with 1–2 new habit ideas.
+Tone: warm, wise, encouraging. Max 400 words.`
+            }]
           }),
         });
 
         const data = await res.json();
 
-        // This is the fix — ChatGPT returns the content in the right place
-        const aiPlan = data?.choices?.[0]?.message?.content?.trim() || 'You are becoming legendary.';
-
-        setPlan(aiPlan);
-
-        saveAIPlan?.({
-          date: new Date().toISOString().split('T')[0],
-          plan: aiPlan,
-          video: videoMap[mbti] || 'https://www.youtube.com/watch?v=lVzxRVxIaxQ',
-        });
+        if (data.choices?.[0]?.message?.content) {
+          const aiPlan = data.choices[0].message.content.trim();
+          setPlan(aiPlan);
+          saveAIPlan?.({
+            date: new Date().toISOString().split('T')[0],
+            plan: aiPlan,
+            video: videoMap[mbti] || 'https://www.youtube.com/watch?v=lVzxRVxIaxQ',
+          });
+        } else {
+          setPlan(`API returned unexpected response:\n${JSON.stringify(data, null, 2)}`);
+        }
       } catch (err) {
-        setPlan('ChatGPT is taking a quick break — keep going, you are becoming legendary.');
+        setPlan(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
       }
     };
 
