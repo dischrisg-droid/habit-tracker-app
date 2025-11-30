@@ -15,6 +15,7 @@ type Habit = {
   days?: number[];
   targettime?: string;
   notes?: string;
+  icon?: string;  // ← new field
 };
 
 type DailyLog = {
@@ -140,6 +141,7 @@ initAuth: async () => {
     set({ personality: p });
   },
 }));
+
 
 
 
