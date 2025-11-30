@@ -1,9 +1,9 @@
-// app/personality/page.tsx — with back button
+// app/personality/page.tsx — SAVE BUTTON FIXED
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useState, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, User } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PersonalityPage() {
@@ -19,6 +19,7 @@ export default function PersonalityPage() {
     whatIWantToStandFor: '',
   });
 
+  // Load existing data
   useEffect(() => {
     if (personality) {
       setForm({
@@ -33,21 +34,23 @@ export default function PersonalityPage() {
     }
   }, [personality]);
 
-  const save = () => savePersonality(form);
+  // SAVE FUNCTION — this was missing or broken before
+  const handleSave = async () => {
+    await savePersonality(form);
+    alert('Profile saved! ✨'); // optional feedback
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 py-20 px-6">
-      {/* Header with Back Button */}
+      {/* Header with back button */}
       <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/30">
-        <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-xl">
-              <ArrowLeft className="w-7 h-7 text-white" />
-            </div>
-            <h1 className="text-5xl font-black bg-gradient-to-r from-pink-600 to-indigo-600 bg-clip-text text-transparent">
-              Personality Profile
-            </h1>
+        <div className="max-w-5xl mx-auto px-6 py-6 flex items-center gap-6">
+          <Link href="/daily-log" className="p-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-xl hover:scale-105 transition">
+            <ArrowLeft className="w-7 h-7 text-white" />
           </Link>
+          <h1 className="text-5xl font-black bg-gradient-to-r from-pink-600 to-indigo-600 bg-clip-text text-transparent">
+            Personality Profile
+          </h1>
         </div>
       </div>
 
@@ -73,8 +76,12 @@ export default function PersonalityPage() {
           <textarea placeholder="What do I want to stand for?" rows={3} value={form.whatIWantToStandFor} onChange={e => setForm({...form, whatIWantToStandFor: e.target.value})} className="w-full px-6 py-4 rounded-2xl border resize-none focus:border-pink-500 outline-none" />
         </div>
 
+        {/* WORKING SAVE BUTTON */}
         <div className="text-center mt-12">
-          <button onClick={save} className="px-16 py-6 text-3xl font-bold text-white bg-gradient-to-r from-pink-600 to-indigo-600 rounded-3xl shadow-2xl hover:scale-105 transition">
+          <button
+            onClick={handleSave}
+            className="px-20 py-8 text-4xl font-bold text-white bg-gradient-to-r from-pink-600 to-indigo-600 rounded-3xl shadow-2xl hover:scale-110 transition"
+          >
             Save Profile
           </button>
         </div>
