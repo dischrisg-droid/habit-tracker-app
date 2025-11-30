@@ -1,9 +1,9 @@
-// app/daily-log/page.tsx — FINAL VERSION (journaling first + AI Coach)
+// app/daily-log/page.tsx — FINAL WORKING VERSION
 'use client';
 
 import { useStore } from '../../store/useStore';
-import { useState, useEffect } from 'react';
-import { Check, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { Check, Sparkles, Flame, User } from 'lucide-react'; // ← Fixed: added Flame & User
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
 
@@ -26,7 +26,7 @@ export default function DailyLogPage() {
     await saveLog({
       date: today,
       completedHabits,
-      extraHabits: [], // keeping simple for now
+      extraHabits: [],
       reflection,
       reframed,
     });
