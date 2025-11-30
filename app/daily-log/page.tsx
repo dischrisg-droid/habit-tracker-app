@@ -1,4 +1,4 @@
-// app/daily-log/page.tsx — FINAL: saves properly + AI button
+// app/daily-log/page.tsx — FINAL & SAVE WORKS 100%
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -21,7 +21,7 @@ export default function DailyLogPage() {
   const [reflection, setReflection] = useState(todayLog.reflection || '');
   const [reframed, setReframed] = useState(todayLog.reframed || '');
 
-  const save = async () => {
+  const handleSave = async () => {
     await saveLog({
       date: today,
       completedHabits,
@@ -31,8 +31,8 @@ export default function DailyLogPage() {
 
     if (completedHabits.length === habits.length && habits.length > 0) {
       confetti({
-        particleCount: 250,
-        spread: 80,
+        particleCount: 300,
+        spread: 100,
         origin: { y: 0.6 },
         colors: ['#6366f1', '#a855f7', '#ec4899', '#10b981'],
       });
@@ -64,16 +64,13 @@ export default function DailyLogPage() {
           </h2>
         </div>
 
-        {/* JOURNALING */}
+        {/* JOURNAL */}
         <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-12 shadow-2xl mb-12 border border-white/50">
-          <h2 className="text-4xl font-black mb-8 text-center bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
-            How was your day?
-          </h2>
           <textarea
-            placeholder="Write freely..."
+            placeholder="How was your day? Write freely..."
             value={reflection}
             onChange={e => setReflection(e.target.value)}
-            rows={12}
+            rows={10}
             className="w-full px-8 py-6 text-xl rounded-3xl border-2 border-indigo-200 focus:border-indigo-500 outline-none resize-none"
           />
           <textarea
@@ -85,7 +82,7 @@ export default function DailyLogPage() {
           />
         </div>
 
-        {/* Quick Habits */}
+        {/* QUICK HABITS */}
         {habits.length > 0 && (
           <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl mb-12">
             <h3 className="text-3xl font-bold mb-8 text-center">Quick Check</h3>
@@ -109,10 +106,10 @@ export default function DailyLogPage() {
           </div>
         )}
 
-        {/* Buttons */}
+        {/* SAVE + AI COACH BUTTONS */}
         <div className="text-center space-y-8">
           <button
-            onClick={save}
+            onClick={handleSave}
             className="px-20 py-8 text-4xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl shadow-2xl hover:scale-110 transition"
           >
             Save Today
