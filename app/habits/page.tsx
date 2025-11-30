@@ -19,7 +19,7 @@ const iconMap: Record<string, any> = {
 export default function HabitsPage() {
   const { habits, logs, saveHabits, saveLog } = useStore();
 
-  const today = new Date().toISOString().split('T')[0');
+  const today = new Date().toISOString().split('T')[0];
   const todayLog = logs.find(l => l.date === today);
 
   const getStreak = (habitId: string) => {
@@ -57,7 +57,7 @@ export default function HabitsPage() {
               </h1>
             </Link>
             <button
-              onClick={() => window.location.href = '/habits/new'} // or open modal
+              onClick={() => window.location.href = '/habits/new'}
               className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:scale-105 transition flex items-center gap-3"
             >
               <Plus className="w-7 h-7" /> New Habit
@@ -78,7 +78,6 @@ export default function HabitsPage() {
                   className="group relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-white/30 overflow-hidden hover:shadow-2xl hover:-translate-y-3 transition-all duration-300 cursor-pointer"
                   onClick={() => toggleHabit(habit.id)}
                 >
-                  {/* Streak Fire Badge */}
                   {streak > 0 && (
                     <div className="absolute -top-6 -right-6 z-10">
                       <div className="relative">
@@ -90,7 +89,6 @@ export default function HabitsPage() {
                     </div>
                   )}
 
-                  {/* Habit Card */}
                   <div className="p-6 text-center">
                     <div className={`w-20 h-20 mx-auto rounded-3xl flex items-center justify-center transition-all ${isDone ? 'bg-green-500 shadow-xl' : 'bg-gray-100'}`}>
                       {isDone ? <Check className="w-12 h-12 text-white" /> : <Icon className="w-12 h-12 text-gray-700" />}
@@ -98,7 +96,6 @@ export default function HabitsPage() {
                     <h3 className="mt-5 text-lg font-bold text-gray-800 line-clamp-2">{habit.name}</h3>
                   </div>
 
-                  {/* Hidden info — appears on hover */}
                   <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-6">
                     <p className="text-sm mb-2">{habit.targettime || 'No time set'}</p>
                     {habit.notes && <p className="text-xs text-center line-clamp-3">{habit.notes}</p>}
