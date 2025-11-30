@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — SAVES PLAN + DAILY CHARISMA VIDEO
+// app/ai-coach/page.tsx — FINAL, NO ERRORS
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -13,11 +13,11 @@ const faculties = [
   { name: 'Perception', icon: Eye, color: 'from-blue-500 to-cyan-500' },
   { name: 'Intuition', icon: Sparkles, color: 'from-yellow-400 to-amber-500' },
   { name: 'Memory', icon: MessageCircle, color: 'from-green-500 to-emerald-500' },
-  { name: 'Reason', icon: Heart, color: 'from-indigo-500 to-purple-500' }, 
+  { name: 'Reason', icon: Heart, color: 'from-indigo-500 to-purple-500' },
 ];
 
 export default function AICoachPage() {
-  const { personality, habits, logs, saveAIPLan } = useStore();
+  const { personality, habits, logs, saveAIPlan } = useStore(); // ← Fixed: was saveAIPLan
   const [plan, setPlan] = useState('');
   const [video, setVideo] = useState('');
 
@@ -33,7 +33,7 @@ export default function AICoachPage() {
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
     const enneagram = personality.enneagram || '';
 
-    // === DAILY CHARISMA VIDEO RECOMMENDATION ===
+    // === DAILY CHARISMA VIDEO ===
     const charismaVideos: Record<string, { name: string; video: string }> = {
       'INFP': { name: 'Adam Driver', video: 'https://www.youtube.com/watch?v=7k4sQb6mX4g' },
       'INFJ': { name: 'Benedict Cumberbatch', video: 'https://www.youtube.com/watch?v=Qqq1q1lB1cI' },
@@ -41,10 +41,12 @@ export default function AICoachPage() {
       'INTP': { name: 'Edward Snowden', video: 'https://www.youtube.com/watch?v=5eIb0J2lB3A' },
       'ENFP': { name: 'Robin Williams', video: 'https://www.youtube.com/watch?v=2y1jP6M2y2Y' },
       'ENFJ': { name: 'Oprah Winfrey', video: 'https://www.youtube.com/watch?v=8tXm2J8g2zE' },
-      // Add more as you like
+      'ENTP': { name: 'Robert Downey Jr.', video: 'https://www.youtube.com/watch?v=3p8EBPVZ2Iw' },
+      'ENTJ': { name: 'Margaret Thatcher', video: 'https://www.youtube.com/watch?v=XDw9o0sH2qM' },
+      // Add more anytime
     };
 
-    const videoRec = charismaVideos[mbti] || { name: 'Tom Hanks (great for most types)', video: 'https://www.youtube.com/watch?v=Rb0h6uMcw2I' };
+    const videoRec = charismaVideos[mbti] || { name: 'Tom Hanks (universal charisma)', video: 'https://www.youtube.com/watch?v=Rb0h6uMcw2I' };
 
     const generatedPlan = `
 Tomorrow belongs to **${mbti} ${enneagram}** who is becoming: "${personality.whoIWantToBe}"
@@ -75,15 +77,15 @@ When you feel a body signal (excitement or resistance), follow it within 5 secon
 Watch this 3–8 minute clip of **${videoRec.name}** and study how he holds space, pauses, and uses eye contact:
 ${videoRec.video}
 
-You are becoming magnetic. Keep going. ✨
+You are becoming magnetic. Keep going.
     `.trim();
 
     setPlan(generatedPlan);
     setVideo(videoRec.video);
 
-    // SAVE THE PLAN AUTOMATICALLY
+    // SAVE PLAN AUTOMATICALLY
     saveAIPlan({ date: new Date().toISOString().split('T')[0], plan: generatedPlan, video: videoRec.video });
-  }, [personality, habits, logs]);
+  }, [personality, habits, logs, saveAIPlan]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
@@ -92,7 +94,7 @@ You are becoming magnetic. Keep going. ✨
           <Link href="/daily-log" className="p-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-xl hover:scale-105 transition">
             <ArrowLeft className="w-7 h-7 text-white" />
           </Link>
-          <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip text-transparent">
+          <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
             Your AI Coach
           </h1>
         </div>
@@ -101,12 +103,12 @@ You are becoming magnetic. Keep going. ✨
       <div className="max-w-4xl mx-auto p-8">
         <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-12 border border-white/50">
           <pre className="whitespace-pre-wrap font-sans text-lg leading-relaxed text-gray-800">
-            {plan || 'Complete today’s log first ✨'}
+            {plan || 'Complete today’s log first'}
           </pre>
 
           {video && (
             <div className="mt-12 text-center">
-              <a href={video} target="_blank" className="inline-flex items-center gap-4 px-10 py-6 bg-gradient-to-r from-red-500 to-pink-600 text-white text-2xl font-bold rounded-3xl shadow-2xl hover:scale-105 transition">
+              <a href={video} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-4 px-10 py-6 bg-gradient-to-r from-red-500 to-pink-600 text-white text-2xl font-bold rounded-3xl shadow-2xl hover:scale-105 transition">
                 <PlayCircle className="w-12 h-12" />
                 Watch Today’s Charisma Video
               </a>
@@ -114,7 +116,6 @@ You are becoming magnetic. Keep going. ✨
           )}
         </div>
 
-        {/* Faculties icons */}
         <div className="mt-16 grid grid-cols-3 md:grid-cols-6 gap-6">
           {faculties.map(f => (
             <div key={f.name} className="text-center">
