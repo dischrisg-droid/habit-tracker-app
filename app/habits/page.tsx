@@ -1,3 +1,4 @@
+// app/habits/page.tsx — FINAL: shows days + beautiful layout
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -16,6 +17,8 @@ const iconMap: Record<string, any> = {
   Smile, Wind, Trees, Trophy
 };
 
+const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 export default function HabitsPage() {
   const { habits, logs, saveHabits, saveLog } = useStore();
 
@@ -24,7 +27,7 @@ export default function HabitsPage() {
 
   const getStreak = (habitId: string) => {
     let streak = 0;
-    const sorted = [...logs].sort((a, b) => b.date.localeCompare(a.date));
+    const sorted = [...logs].sort((a => b.date.localeCompare(a.date));
     for (const log of sorted) {
       const daysAgo = Math.floor((Date.now() - new Date(log.date).getTime()) / 86400000);
       if (daysAgo > streak + 1) break;
@@ -43,6 +46,26 @@ export default function HabitsPage() {
     saveLog({ ...todayLog, completedHabits: updated });
   };
 
+  const renderDays = (habit: any) => {
+    if (habit.frequency === 'daily') return <span className="text-sm text-gray-600">Every day</span>;
+
+    const days = habit.days || [];
+    return (
+      <div className="flex gap-1">
+        {dayNames.map((d, i) => (
+          <span
+            key={i}
+            className={`w-6 h-6 rounded text-xs flex items-center justify-center font-medium ${
+              days.includes(i) ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'
+            }`}
+          >
+            {d[0]}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
@@ -56,55 +79,58 @@ export default function HabitsPage() {
                 My Habits
               </h1>
             </Link>
-            <button
-              onClick={() => window.location.href = '/habits/new'}
-              className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:scale-105 transition flex items-center gap-3"
-            >
-              <Plus className="w-7 h-7" /> New Habit
-            </button>
+            <Link>
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto p-8">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {habits.map((habit) => {
               const streak = getStreak(habit.id);
               const isDone = todayLog?.completedHabits.includes(habit.id);
               const Icon = iconMap[habit.icon || ''] || Flame;
 
               return (
-                <div
-                  key={habit.id}
-                  className="group relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-white/30 overflow-hidden hover:shadow-2xl hover:-translate-y-3 transition-all duration-300 cursor-pointer"
-                  onClick={() => toggleHabit(habit.id)}
-                >
+                <div key={habit.id} className="relative group">
+                  {/* Fire Badge */}
                   {streak > 0 && (
-                    <div className="absolute -top-6 -right-6 z-10">
+                    <div className="absolute -top-8 -right-8 z-10">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-orange-400 rounded-full blur-xl opacity-70 animate-ping"></div>
-                        <div className="relative bg-gradient-to-br from-orange-500 to-red-600 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-2xl font-black text-2xl border-4 border-white">
+                        <div className="absolute inset-0 bg-orange-400 rounded-full blur-2xl opacity-70 animate-ping"></div>
+                        <div className="relative bg-gradient-to-br from-orange-500 to-red-600 text-white w-20 h-20 rounded-full flex items-center justify-center shadow-2xl font-black text-4xl border-4 border-white">
                           {streak}
                         </div>
                       </div>
                     </div>
                   )}
 
-                  <div className="p-6 text-center">
-                    <div className={`w-20 h-20 mx-auto rounded-3xl flex items-center justify-center transition-all ${isDone ? 'bg-green-500 shadow-xl' : 'bg-gray-100'}`}>
-                      {isDone ? <Check className="w-12 h-12 text-white" /> : <Icon className="w-12 h-12 text-gray-700" />}
-                    </div>
-                    <h3 className="mt-5 text-lg font-bold text-gray-800 line-clamp-2">{habit.name}</h3>
-                  </div>
-
-                  <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-6">
-                    <p className="text-sm mb-2">{habit.targettime || 'No time set'}</p>
-                    {habit.notes && <p className="text-xs text-center line-clamp-3">{habit.notes}</p>}
-                    <div className="absolute bottom-4 right-4 flex gap-3">
-                      <button onClick={(e) => { e.stopPropagation(); /* edit */ }} className="p-2 bg-white/20 rounded-lg">
-                        <Edit2 className="w-5 h-5" />
+                  <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl hover:shadow-3xl hover:-translate-y-4 transition-all duration-500 border border-white/50">
+                    <div className="flex items-start justify-between mb-6">
+                      <button
+                        onClick={() => toggleHabit(habit.id)}
+                        className={`w-20 h-20 rounded-3xl flex items-center justify-center transition-all ${isDone ? 'bg-green-500 shadow-xl' : 'bg-gray-100'}`}
+                      >
+                        {isDone ? <Check className="w-12 h-12 text-white" /> : <Icon className="w-12 h-12 text-gray-700" />}
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); /* delete */ }} className="p-2 bg-red-500/30 rounded-lg">
-                        <Trash2 className="w-5 h-5" />
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">{habit.name}</h3>
+
+                    {/* Days to perform — ALWAYS VISIBLE */}
+                    <div className="mb-4">
+                      {renderDays(habit)}
+                    </div>
+
+                    {habit.targettime && (
+                      <p className="text-gray-600 text-sm">Target: {habit.targettime}</p>
+                    )}
+
+                    <div className="mt-8 flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition">
+                      <button className="p-2 hover:bg-indigo-100 rounded-lg">
+                        <Edit2 className="w-5 h-5 text-indigo-600" />
+                      </button>
+                      <button className="p-2 hover:bg-red-100 rounded-lg">
+                        <Trash2 className="w-5 h-5 text-red-600" />
                       </button>
                     </div>
                   </div>
@@ -117,6 +143,7 @@ export default function HabitsPage() {
     </>
   );
 }
+
 
 
 
