@@ -16,7 +16,7 @@ const iconMap: Record<string, any> = {
   Smile, Wind, Trees, Trophy
 };
 
-const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const dayLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 export default function HabitsPage() {
   const { habits, logs, saveHabits, saveLog } = useStore();
@@ -34,7 +34,6 @@ export default function HabitsPage() {
   const today = new Date().toISOString().split('T')[0];
   const todayLog = logs.find(l => l.date === today);
 
-  // 42-day calendar data
   const getCalendarData = (habitId: string) => {
     const data = [];
     for (let i = 41; i >= 0; i--) {
@@ -43,7 +42,7 @@ export default function HabitsPage() {
       const dateStr = date.toISOString().split('T')[0];
       const log = logs.find(l => l.date === dateStr);
       const done = log?.completedHabits.includes(habitId);
-      data.push({ done: !!done, isToday: i === 0, dateStr });
+      data.push({ done: !!done, isToday: i === 0, date });
     }
     return data;
   };
@@ -80,24 +79,22 @@ export default function HabitsPage() {
       ? { ...editing, ...form, name: form.name.trim() }
       : { id: crypto.randomUUID(), ...form, name: form.name.trim() };
     await saveHabits(editing ? habits.map(h => h.id === editing.id ? newHabit : h) : [...habits, newHabit]);
-    setShowForm(false);
-    setEditing(null);
-    setForm({ name: '', frequency: 'daily', days: [], targettime: '', notes: '' });
+    setShowForm(false); setEditing(null); setForm({ name: '', frequency: 'daily', days: [], targettime: '', notes: '' });
   };
 
   const renderDays = (habit: any) => {
     if (habit.frequency === 'daily') return <span className="text-sm font-medium text-indigo-600">Every day</span>;
     const days = habit.days || [];
     return (
-      <div className="flex gap-1 flex-wrap">
-        {dayNames.map((day, i) => (
+      <div className="flex gap-1">
+        {dayLetters.map((letter, i) => (
           <span
             key={i}
             className={`w-7 h-7 rounded-full text-xs flex items-center justify-center font-bold ${
               days.includes(i) ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'
             }`}
           >
-            {day[0]}
+            {letter}
           </span>
         ))}
       </div>
@@ -118,11 +115,7 @@ export default function HabitsPage() {
             </h1>
           </Link>
           <button
-            onClick={() => {
-              setEditing(null);
-              setForm({ name: '', frequency: 'daily', days: [], targettime: '', notes: '' });
-              setShowForm(true);
-            }}
+            onClick={() => { setEditing(null); setForm({ name: '', frequency: 'daily', days: [], targettime: '', notes: '' }); setShowForm(true); }}
             className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:scale-105 transition flex items-center gap-3"
           >
             <Plus className="w-7 h-7" /> New Habit
@@ -165,8 +158,18 @@ export default function HabitsPage() {
                   </div>
                 </div>
 
-                {/* 42-day Calendar */}
+                {/* Calendar with letters above */}
                 <div className="p-6">
+                  {/* Day letters */}
+                  <div className="grid grid-cols-7 gap-1.5 mb-3">
+                    {dayLetters.map((letter) => (
+                      <div key={letter} className="text-center text-xs font-bold text-gray-600">
+                        {letter}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* 42-day grid */}
                   <div className="grid grid-cols-7 gap-1.5">
                     {calendar.map((day, i) => (
                       <div
@@ -175,10 +178,11 @@ export default function HabitsPage() {
                           day.isToday ? 'ring-4 ring-indigo-400 ring-opacity-50' : ''
                         } ${day.done ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}
                       >
-                        {day.isToday ? 'TODAY' : new Date(day.dateStr).getDate()}
+                        {day.isToday ? 'TODAY' : day.date.getDate()}
                       </div>
                     ))}
                   </div>
+
                   {streak > 0 && (
                     <div className="text-center mt-6">
                       <div className="inline-flex items-center gap-2 text-3xl font-black text-orange-600">
@@ -194,56 +198,9 @@ export default function HabitsPage() {
         </div>
       </div>
 
-      {/* Full Edit Modal */}
+      {/* Modal — keep your current one */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex items-center justify-center p-6 z-50">
-          <div className="bg-white rounded-3xl shadow-3xl p-12 max-w-2xl w-full max-h-screen overflow-y-auto">
-            <h2 className="text-5xl font-black text-center mb-12 bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
-              {editing ? 'Edit Habit' : 'New Habit'}
-            </h2>
-
-            <input autoFocus placeholder="Habit name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-8 py-6 text-2xl rounded-2xl border-4 border-indigo-200 focus:border-indigo-500 outline-none mb-8" />
-
-            <div className="mb-8">
-              <div className="flex gap-8">
-                {(['daily', 'weekly'] as const).map(f => (
-                  <label key={f} className="flex items-center gap-3 cursor-pointer">
-                    <input type="radio" checked={form.frequency === f} onChange={() => setForm({ ...form, frequency: f, days: f === 'daily' ? [] : form.days })} className="w-6 h-6 text-indigo-600" />
-                    <span className="text-xl font-medium capitalize">{f === 'daily' ? 'Daily' : 'Choose days'}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {form.frequency === 'weekly' && (
-              <div className="flex justify-center gap-4 mb-8">
-                {dayNames.map((day, i) => (
-                  <label key={i} className="cursor-pointer">
-                    <input type="checkbox" checked={form.days.includes(i)} onChange={e => setForm({
-                      ...form,
-                      days: e.target.checked ? [...form.days, i] : form.days.filter(d => d !== i)
-                    })} className="sr-only" />
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all ${form.days.includes(i) ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                      {day[0]}
-                    </div>
-                  </label>
-                ))}
-              </div>
-            )}
-
-            <input placeholder="Best time (optional)" value={form.targettime} onChange={e => setForm({ ...form, targettime: e.target.value })} className="w-full px-8 py-6 text-xl rounded-2xl border-4 border-pink-200 focus:border-pink-500 outline-none mb-8" />
-            <textarea placeholder="Notes (optional)" rows={4} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} className="w-full px-8 py-6 text-xl rounded-2xl border-4 border-gray-200 focus:border-indigo-500 outline-none resize-none" />
-
-            <div className="flex gap-6 mt-12">
-              <button onClick={save} className="flex-1 py-7 text-3xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-2xl">
-                {editing ? 'Update' : 'Create'}
-              </button>
-              <button onClick={() => setShowForm(false)} className="px-12 py-7 text-3xl font-bold bg-gray-200 rounded-2xl">
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+        // ... your full modal code from before ...
       )}
     </div>
   );
