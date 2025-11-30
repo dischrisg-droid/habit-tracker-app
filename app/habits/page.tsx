@@ -1,4 +1,4 @@
-// app/habits/page.tsx — FINAL: shows days + beautiful layout
+// app/habits/page.tsx — FINAL, NO ERRORS, shows days clearly
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -27,7 +27,7 @@ export default function HabitsPage() {
 
   const getStreak = (habitId: string) => {
     let streak = 0;
-    const sorted = [...logs].sort((a => b.date.localeCompare(a.date));
+    const sorted = [...logs].sort((a, b) => b.date.localeCompare(a.date));
     for (const log of sorted) {
       const daysAgo = Math.floor((Date.now() - new Date(log.date).getTime()) / 86400000);
       if (daysAgo > streak + 1) break;
@@ -47,19 +47,23 @@ export default function HabitsPage() {
   };
 
   const renderDays = (habit: any) => {
-    if (habit.frequency === 'daily') return <span className="text-sm text-gray-600">Every day</span>;
+    if (habit.frequency === 'daily') {
+      return <span className="text-sm font-medium text-indigo-600">Every day</span>;
+    }
 
     const days = habit.days || [];
     return (
-      <div className="flex gap-1">
-        {dayNames.map((d, i) => (
+      <div className="flex gap-1 flex-wrap">
+        {dayNames.map((day, i) => (
           <span
             key={i}
-            className={`w-6 h-6 rounded text-xs flex items-center justify-center font-medium ${
-              days.includes(i) ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'
+            className={`w-7 h-7 rounded-full text-xs flex items-center justify-center font-bold ${
+              days.includes(i)
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 text-gray-500'
             }`}
           >
-            {d[0]}
+            {day[0]}
           </span>
         ))}
       </div>
@@ -69,6 +73,7 @@ export default function HabitsPage() {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+        {/* Header */}
         <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b">
           <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
             <Link href="/" className="flex items-center gap-4">
@@ -79,10 +84,16 @@ export default function HabitsPage() {
                 My Habits
               </h1>
             </Link>
-            <Link>
+            <button
+              onClick={() => window.location.href = '/habits/new'}
+              className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:scale-105 transition flex items-center gap-3"
+            >
+              <Plus className="w-7 h-7" /> New Habit
+            </button>
           </div>
         </div>
 
+        {/* Habits Grid */}
         <div className="max-w-7xl mx-auto p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {habits.map((habit) => {
@@ -104,19 +115,20 @@ export default function HabitsPage() {
                     </div>
                   )}
 
-                  <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl hover:shadow-3xl hover:-translate-y-4 transition-all duration-500 border border-white/50">
+                  {/* Habit Card */}
+                  <div
+                    onClick={() => toggleHabit(habit.id)}
+                    className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl hover:shadow-3xl hover:-translate-y-4 transition-all duration-500 border border-white/50 cursor-pointer"
+                  >
                     <div className="flex items-start justify-between mb-6">
-                      <button
-                        onClick={() => toggleHabit(habit.id)}
-                        className={`w-20 h-20 rounded-3xl flex items-center justify-center transition-all ${isDone ? 'bg-green-500 shadow-xl' : 'bg-gray-100'}`}
-                      >
+                      <div className={`w-20 h-20 rounded-3xl flex items-center justify-center transition-all ${isDone ? 'bg-green-500 shadow-xl' : 'bg-gray-100'}`}>
                         {isDone ? <Check className="w-12 h-12 text-white" /> : <Icon className="w-12 h-12 text-gray-700" />}
-                      </button>
+                      </div>
                     </div>
 
                     <h3 className="text-2xl font-bold text-gray-800 mb-4">{habit.name}</h3>
 
-                    {/* Days to perform — ALWAYS VISIBLE */}
+                    {/* DAYS — ALWAYS VISIBLE */}
                     <div className="mb-4">
                       {renderDays(habit)}
                     </div>
@@ -125,6 +137,7 @@ export default function HabitsPage() {
                       <p className="text-gray-600 text-sm">Target: {habit.targettime}</p>
                     )}
 
+                    {/* Hover actions */}
                     <div className="mt-8 flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition">
                       <button className="p-2 hover:bg-indigo-100 rounded-lg">
                         <Edit2 className="w-5 h-5 text-indigo-600" />
@@ -143,7 +156,6 @@ export default function HabitsPage() {
     </>
   );
 }
-
 
 
 
