@@ -13,7 +13,7 @@ const faculties = [
   { name: 'Perception', icon: Eye, color: 'from-blue-500 to-cyan-500' },
   { name: 'Intuition', icon: Sparkles, color: 'from-yellow-400 to-amber-500' },
   { name: 'Memory', icon: MessageCircle, color: 'from-green-500 to-emerald-500' },
-  { name: 'Reason', icon: Heart, color: 'from-indigo-500 to-purple-500' },
+  { name: 'Reason', icon: Heart, color: 'from-indigo-500 to-purple-500' }, 
 ];
 
 export default function AICoachPage() {
