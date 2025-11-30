@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — LIVE AI + VALID VIDEOS
+// app/ai-coach/page.tsx — LIVE GROK AI + YOUR API KEY
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -16,71 +16,78 @@ const faculties = [
   { name: 'Reason', icon: Heart, color: 'from-indigo-500 to-purple-500' },
 ];
 
-// Fresh charisma videos (updated from search results)
-const charismaVideos: Record<string, { name: string; url: string; description: string }> = {
-  INFP: { name: 'Adam Driver', url: 'https://www.youtube.com/watch?v=zwK6Mzm7rvY', description: 'Tony Award nomination discussion — study his introspective presence.' },
-  INFJ: { name: 'Benedict Cumberbatch', url: 'https://www.youtube.com/watch?v=u9uVAIod9T4', description: 'Line-guessing fun — observe his thoughtful pauses and charm.' },
-  INTJ: { name: 'Elon Musk', url: 'https://www.youtube.com/watch?v=gPGZRJDVXcU', description: 'Tesla/politics interview — analyze his visionary delivery.' },
-  ENFP: { name: 'Robin Williams', url: 'https://www.youtube.com/watch?v=uPJTfshToOU', description: 'Parkinson interview — watch his infectious energy and quick wit.' },
-  ENFJ: { name: 'Oprah Winfrey', url: 'https://www.youtube.com/watch?v=WAGUSdZaE6c', description: 'Iconic roles reflection — see her empathetic connection.' },
-  default: { name: 'Tom Hanks', url: 'https://www.youtube.com/watch?v=lVzxRVxIaxQ', description: 'Countenance theory — master of relatable charisma.' },
-};
-
 export default function AICoachPage() {
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('Loading your personalized plan...');
+  const [plan, setPlan] = useState('Generating your personalized plan with Grok...');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    if (!personality) {
-      setPlan('Please complete your Personality Profile first.');
+    if (!personality || !logs || logs.length === 0) {
+      setPlan('Please save a daily log first.');
       return;
     }
 
-    const todayLog = logs[logs.length - 1] || {};
-    const completed = todayLog.completedHabits?.length || 0;
-    const total = habits.length;
-    const mbti = personality.mbti?.toUpperCase() || 'DEFAULT';
+    const todayLog = logs[logs.length - 1];
+    const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
     const vision = personality.whoIWantToBe || 'your highest self';
 
-    // Live AI call (replace with your Grok API key)
-    const getAIPlan = async () => {
-      const response = await fetch('https://api.x.ai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer YOUR_GROK_API_KEY', // Get from https://x.ai/api
-        },
-        body: JSON.stringify({
-          model: 'grok-beta',
-          messages: [
-            {
-              role: 'system',
-              content: `You are a world-class Co-Active coach. Create a tomorrow's plan for ${mbti} ${personality.enneagram || ''} who wants to become "${vision}". They completed ${completed}/${total} habits today. Journal: "${todayLog.reflection || ''}". Reframed: "${todayLog.reframed || ''}". Structure around 6 Higher Faculties: Imagination, Will, Perception, Intuition, Memory, Reason. 1 short activity per faculty. End with 1-2 new habit recommendations. Tone: warm, wise, encouraging.`
-            }
-          ],
-          max_tokens: 300,
-        }),
-      });
+    // Fresh charisma videos
+    const videoMap: Record<string, { name: string; url: string }> = {
+      INFP: { name: 'Adam Driver', url: 'https://www.youtube.com/watch?v=zwK6Mzm7rvY' },
+      INFJ: { name: 'Benedict Cumberbatch', url: 'https://www.youtube.com/watch?v=u9uVAIod9T4' },
+      INTJ: { name: 'Elon Musk', url: 'https://www.youtube.com/watch?v=gPGZRJDVXcU' },
+      ENFP: { name: 'Robin Williams', url: 'https://www.youtube.com/watch?v=uPJTfshToOU' },
+      ENFJ: { name: 'Oprah Winfrey', url: 'https://www.youtube.com/watch?v=WAGUSdZaE6c' },
+    };
+    const videoRec = videoMap[mbti] || { name: 'Tom Hanks', url: 'https://www.youtube.com/watch?v=lVzxRVxIaxQ' };
+    setVideo(videoRec.url);
 
-      const data = await response.json();
-      const aiResponse = data.choices[0].message.content || 'AI error — try again.';
+    // LIVE GROK API CALL
+    const callGrok = async () => {
+      try {
+        const response = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer xai-VHH7AsnitnZiGm7kfRCRZDntoQuKwKQIzmTIWoMKk3EVahCe40ZomzxkB0AQeawIeVtsO3WzzuODTA7d',
+          },
+          body: JSON.stringify({
+            model: 'grok-beta',
+            messages: [
+              {
+                role: 'system',
+                content: `You are a world-class Co-Active coach for a ${mbti} who wants to become: "${vision}". 
+They completed ${todayLog.completedHabits?.length || 0}/${habits.length} habits today.
+Journal: "${todayLog.reflection || 'none'}"
+Reframed: "${todayLog.reframed || 'none'}"
 
-      setPlan(aiResponse);
-      saveAIPlan?.({
-        date: new Date().toISOString().split('T')[0],
-        plan: aiResponse,
-        video: '',
-      });
+Give a beautiful tomorrow plan using the 6 Higher Faculties: Imagination, Will, Perception, Intuition, Memory, Reason.
+One short, powerful activity per faculty.
+End with 1–2 new habit suggestions that fit them perfectly.
+Tone: warm, wise, encouraging, slightly playful.`
+              }
+            ],
+            max_tokens: 400,
+            temperature: 0.8,
+          }),
+        });
+
+        const data = await response.json();
+        const aiResponse = data.choices?.[0]?.message?.content || 'Grok is thinking...';
+
+        setPlan(aiResponse.trim());
+        saveAIPlan?.({
+          date: new Date().toISOString().split('T')[0],
+          plan: aiResponse.trim(),
+          video: videoRec.url,
+        });
+      } catch (error) {
+        setPlan('AI temporarily unavailable — using fallback plan.\n\nKeep going — you are becoming legendary.');
+      }
     };
 
-    getAIPlan();
-
-    // Charisma video (updated from search)
-    const videoRec = charismaVideos[mbti] || charismaVideos.default;
-    setVideo(videoRec.url);
+    callGrok();
   }, [personality, habits, logs, saveAIPlan]);
 
   return (
@@ -91,7 +98,7 @@ export default function AICoachPage() {
             <ArrowLeft className="w-7 h-7 text-white" />
           </Link>
           <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
-            Your AI Coach
+            Your AI Coach (Live with Grok)
           </h1>
         </div>
       </div>
@@ -128,5 +135,4 @@ export default function AICoachPage() {
   );
 }
 
-// Stop prerendering
 export const dynamic = 'force-dynamic';
