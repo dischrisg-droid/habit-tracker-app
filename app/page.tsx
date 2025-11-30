@@ -1,9 +1,8 @@
-// app/page.tsx — now just a redirect
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useStore } from './store/useStore';
+import { useStore } from '../store/useStore';  // ← this was the problem
 
 export default function Home() {
   const router = useRouter();
@@ -18,6 +17,7 @@ export default function Home() {
 
   return null;
 }
+
 
 
 
