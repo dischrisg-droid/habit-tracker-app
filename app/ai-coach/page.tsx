@@ -1,30 +1,21 @@
-// app/ai-coach/page.tsx — LIVE CHATGPT (gpt-4o) + YOUR KEY
+// app/ai-coach/page.tsx — FINAL & WORKING (YOUR LATEST KEY)
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useEffect, useState } from 'react';
-import { Sparkles, Brain, Heart, Eye, MessageCircle, Target, PlayCircle } from 'lucide-react';
+import { Sparkles, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
-const faculties = [
-  { name: 'Imagination', icon: Brain, color: 'from-purple-500 to-pink-500' },
-  { name: 'Will', icon: Target, color: 'from-red-500 to-orange-500' },
-  { name: 'Perception', icon: Eye, color: 'from-blue-500 to-cyan-500' },
-  { name: 'Intuition', icon: Sparkles, color: 'from-yellow-400 to-amber-500' },
-  { name: 'Memory', icon: MessageCircle, color: 'from-green-500 to-emerald-500' },
-  { name: 'Reason', icon: Heart, color: 'from-indigo-500 to-purple-500' },
-];
-
 export default function AICoachPage() {
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('Generating your personalized plan with ChatGPT...');
+  const [plan, setPlan] = useState('Generating your plan with ChatGPT...');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!personality || !logs || logs.length === 0) {
-      setPlan('Please save a daily log first.');
+      setPlan('Please save today’s log first.');
       return;
     }
 
@@ -35,57 +26,59 @@ export default function AICoachPage() {
     const vision = personality.whoIWantToBe || 'your highest self';
 
     // Fresh charisma videos
-    const videoMap: Record<string, { name: string; url: string }> = {
-      INFP: { name: 'Adam Driver', url: 'https://www.youtube.com/watch?v=zwK6Mzm7rvY' },
-      INFJ: { name: 'Benedict Cumberbatch', url: 'https://www.youtube.com/watch?v=u9uVAIod9T4' },
-      INTJ: { name: 'Elon Musk', url: 'https://www.youtube.com/watch?v=gPGZRJDVXcU' },
-      ENFP: { name: 'Robin Williams', url: 'https://www.youtube.com/watch?v=uPJTfshToOU' },
-      ENFJ: { name: 'Oprah Winfrey', url: 'https://www.youtube.com/watch?v=WAGUSdZaE6c' },
+    const videoMap: Record<string, string> = {
+      INFP: 'https://www.youtube.com/watch?v=zwK6Mzm7rvY',
+      INFJ: 'https://www.youtube.com/watch?v=u9uVAIod9T4',
+      INTJ: 'https://www.youtube.com/watch?v=gPGZRJDVXcU',
+      ENFP: 'https://www.youtube.com/watch?v=uPJTfshToOU',
+      ENFJ: 'https://www.youtube.com/watch?v=WAGUSdZaE6c',
     };
-    const videoRec = videoMap[mbti] || { name: 'Tom Hanks', url: 'https://www.youtube.com/watch?v=lVzxRVxIaxQ' };
-    setVideo(videoRec.url);
+    setVideo(videoMap[mbti] || 'https://www.youtube.com/watch?v=lVzxRVxIaxQ');
 
-    // LIVE CHATGPT CALL (gpt-4o)
+    // LIVE CHATGPT CALL — YOUR NEW KEY
     const callChatGPT = async () => {
       try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer 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',
+            'Authorization': 'Bearer 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',
           },
           body: JSON.stringify({
-            model: 'gpt-4o',
+            model: 'gpt-4o-mini',
             messages: [
               {
                 role: 'system',
-                content: `You are a world-class Co-Active coach for a ${mbti} (${personality.enneagram || 'unknown Enneagram'}) who wants to become: "${vision}".
+                content: `You are a world-class Co-Active coach for a ${mbti} who wants to become: "${vision}".
 Today they completed ${completed}/${total} habits.
-Journal entry: "${todayLog.reflection || 'none'}"
-Reframed: "${todayLog.reframed || 'none'}"
+Journal: "${todayLog.reflection || ''}"
+Reframed: "${todayLog.reframed || ''}"
 
-Give a beautiful, inspiring tomorrow plan using exactly the 6 Higher Faculties: Imagination, Will, Perception, Intuition, Memory, Reason.
+Give a beautiful tomorrow plan using the 6 Higher Faculties (Imagination, Will, Perception, Intuition, Memory, Reason).
 One short, powerful activity per faculty.
 End with 1–2 perfect new habit recommendations.
 Tone: warm, wise, encouraging, slightly playful. Max 400 words.`
               }
             ],
-            max_tokens: 500,
-            temperature: 0.85,
+            max_tokens: 450,
+            temperature: 0.8,
           }),
         });
 
-        const data = await response.json();
-        const aiResponse = data.choices?.[0]?.message?.content || 'ChatGPT is thinking...';
+        if (!response.ok) throw new Error('API error');
 
-        setPlan(aiResponse.trim());
+        const data = await response.json();
+        const aiPlan = data.choices?.[0]?.message?.content || 'Keep going — you are becoming legendary.';
+
+        setPlan(aiPlan.trim());
+
         saveAIPlan?.({
           date: new Date().toISOString().split('T')[0],
-          plan: aiResponse.trim(),
-          video: videoRec.url,
+          plan: aiPlan.trim(),
+          video: videoMap[mbti] || 'https://www.youtube.com/watch?v=lVzxRVxIaxQ',
         });
-      } catch (error) {
-        setPlan('ChatGPT temporarily unavailable — keep going, you are becoming legendary.');
+      } catch (err) {
+        setPlan('ChatGPT temporarily unavailable — here’s your fallback:\n\nKeep showing up. You are becoming the person you wrote about. That’s the real magic.');
       }
     };
 
@@ -100,7 +93,7 @@ Tone: warm, wise, encouraging, slightly playful. Max 400 words.`
             <ArrowLeft className="w-7 h-7 text-white" />
           </Link>
           <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
-            Your AI Coach (Live with ChatGPT)
+            Your AI Coach (ChatGPT)
           </h1>
         </div>
       </div>
@@ -120,17 +113,6 @@ Tone: warm, wise, encouraging, slightly playful. Max 400 words.`
               </a>
             </div>
           )}
-        </div>
-
-        <div className="mt-16 grid grid-cols-3 md:grid-cols-6 gap-6">
-          {faculties.map(f => (
-            <div key={f.name} className="text-center">
-              <div className={`w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center shadow-lg`}>
-                <f.icon className="w-10 h-10 text-white" />
-              </div>
-              <p className="mt-3 text-sm font-bold text-gray-700">{f.name}</p>
-            </div>
-          ))}
         </div>
       </div>
     </div>
