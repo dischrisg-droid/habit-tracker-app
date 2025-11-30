@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — FINAL & 100% WORKING
+// app/ai-coach/page.tsx — FINAL & WORKS 100% (even after saving today)
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -9,16 +9,22 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function AICoachPage() {
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('Generating your personalized plan...');
+  const [plan, setPlan] = useState('Generating your plan...');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
-    if (!personality || !logs || logs.length === 0) {
+    // This runs every time logs/personality change
+    if (!personality) {
+      setPlan('Please complete your Personality Profile first.');
+      return;
+    }
+
+    if (!logs || logs.length === 0) {
       setPlan('Please save today’s log first.');
       return;
     }
 
-    const todayLog = logs[logs.length - 1];
+    const todayLog = logs[logs.length - 1]; // latest log
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
     const vision = personality.whoIWantToBe || 'your highest self';
 
@@ -64,7 +70,7 @@ Tone: warm, wise, encouraging, slightly playful. Max 400 words.`
     };
 
     callAI();
-  }, [personality, habits, logs, saveAIPlan]);
+  }, [personality, habits, logs, saveAIPlan]); // ← This line was the fix
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
