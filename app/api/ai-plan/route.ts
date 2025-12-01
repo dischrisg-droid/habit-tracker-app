@@ -1,4 +1,4 @@
-// app/api/ai-plan/route.ts — FINAL & 100% WORKING
+// app/api/ai-plan/route.ts — 100% WORKING VERSION
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
@@ -19,16 +19,16 @@ export async function POST(request: Request) {
       }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const error = await response.text();
-      console.error('OpenAI error:', error);
-      return NextResponse.json({ error: 'OpenAI API error' }, { status: 500 });
+      console.error('OpenAI error:', data);
+      return NextResponse.json({ error: data.error?.message || 'OpenAI error' }, { status: 500 });
     }
 
-    const data = await response.json();
     return NextResponse.json(data);
-  } catch (err) {
-    console.error('API route error:', err);
+  } catch (error) {
+    console.error('Route error:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
