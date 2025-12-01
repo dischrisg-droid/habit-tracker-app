@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — GROK AI (FULL PLANS WITH YOUR KEY)
+// app/ai-coach/page.tsx — GROK 4.1 (FULL PLANS)
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -9,7 +9,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function AICoachPage() {
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('Generating your plan with Grok...');
+  const [plan, setPlan] = useState('Generating your plan with Grok 4.1...');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
@@ -22,7 +22,6 @@ export default function AICoachPage() {
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
     const vision = personality.whoIWantToBe || 'your highest self';
 
-    // Fresh videos
     const videoMap: Record<string, string> = {
       INFP: 'https://www.youtube.com/watch?v=zwK6Mzm7rvY',
       INFJ: 'https://www.youtube.com/watch?v=u9uVAIod9T4',
@@ -39,7 +38,7 @@ export default function AICoachPage() {
         body: JSON.stringify({
           messages: [{
             role: 'system',
-            content: `You are Grok, a witty, helpful coach for a ${mbti} 6w5 who wants to become: "${vision}".
+            content: `You are Grok 4.1, a witty, helpful coach for a ${mbti} 6w5 who wants to become: "${vision}".
 Today they completed ${todayLog.completedHabits?.length || 0}/${habits.length} habits.
 Journal: "${todayLog.reflection || 'none'}"
 Reframed: "${todayLog.reframed || 'none'}"
@@ -74,7 +73,7 @@ Tone: warm, wise, encouraging, with a touch of humor. Max 400 words.`
             <ArrowLeft className="w-7 h-7 text-white" />
           </Link>
           <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
-            Your AI Coach (Grok)
+            Your AI Coach (Grok 4.1)
           </h1>
         </div>
       </div>
