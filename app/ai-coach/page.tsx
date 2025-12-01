@@ -1,16 +1,15 @@
-// app/ai-coach/page.tsx — GROK 4.1 (FULL PLANS)
+// app/ai-coach/page.tsx — NO VIDEO LINK, AI RECOMMENDS VIDEO + READING
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useEffect, useState } from 'react';
-import { Sparkles, PlayCircle } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 export default function AICoachPage() {
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('Generating your plan with Grok 4.1...');
-  const [video, setVideo] = useState('');
+  const [plan, setPlan] = useState('Generating your perfect tomorrow...');
 
   useEffect(() => {
     if (!personality || !logs || logs.length === 0) {
@@ -20,16 +19,6 @@ export default function AICoachPage() {
 
     const todayLog = logs[logs.length - 1];
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
-    const vision = personality.whoIWantToBe || 'your highest self';
-
-    const videoMap: Record<string, string> = {
-      INFP: 'https://www.youtube.com/watch?v=zwK6Mzm7rvY',
-      INFJ: 'https://www.youtube.com/watch?v=u9uVAIod9T4',
-      INTJ: 'https://www.youtube.com/watch?v=gPGZRJDVXcU',
-      ENFP: 'https://www.youtube.com/watch?v=uPJTfshToOU',
-      ENFJ: 'https://www.youtube.com/watch?v=WAGUSdZaE6c',
-    };
-    setVideo(videoMap[mbti] || 'https://www.youtube.com/watch?v=lVzxRVxIaxQ');
 
     const callAI = async () => {
       const res = await fetch('/api/ai-plan', {
@@ -38,15 +27,18 @@ export default function AICoachPage() {
         body: JSON.stringify({
           messages: [{
             role: 'system',
-            content: `You are Grok 4.1, a witty, helpful coach for a ${mbti} 6w5 who wants to become: "${vision}".
+            content: `You are a world-class coach for a ${mbti} 6w5 who wants to become: "${personality.whoIWantToBe}".
 Today they completed ${todayLog.completedHabits?.length || 0}/${habits.length} habits.
 Journal: "${todayLog.reflection || 'none'}"
 Reframed: "${todayLog.reframed || 'none'}"
 
 Give a beautiful tomorrow plan using the 6 Higher Faculties (Imagination, Will, Perception, Intuition, Memory, Reason).
 One short activity per faculty.
-End with 1–2 perfect new habit ideas.
-Tone: warm, wise, encouraging, with a touch of humor. Max 400 words.`
+Then recommend:
+• One specific 5–15 minute YouTube video to study charisma today (include exact title + link)
+• One 5–10 minute article or short reading on personal growth or faith (include title + link)
+
+Tone: warm, wise, encouraging, slightly playful. Max 450 words.`
           }]
         }),
       });
@@ -58,7 +50,7 @@ Tone: warm, wise, encouraging, with a touch of humor. Max 400 words.`
       saveAIPlan?.({
         date: new Date().toISOString().split('T')[0],
         plan: aiPlan.trim(),
-        video: videoMap[mbti] || 'https://www.youtube.com/watch?v=lVzxRVxIaxQ',
+        video: '',
       });
     };
 
@@ -73,7 +65,7 @@ Tone: warm, wise, encouraging, with a touch of humor. Max 400 words.`
             <ArrowLeft className="w-7 h-7 text-white" />
           </Link>
           <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
-            Your AI Coach (Grok 4.1)
+            Your AI Coach
           </h1>
         </div>
       </div>
@@ -83,16 +75,6 @@ Tone: warm, wise, encouraging, with a touch of humor. Max 400 words.`
           <pre className="whitespace-pre-wrap font-sans text-lg leading-relaxed text-gray-800">
             {plan}
           </pre>
-
-          {video && (
-            <div className="mt-12 text-center">
-              <a href={video} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-4 px-10 py-6 bg-gradient-to-r from-red-500 to-pink-600 text-white text-2xl font-bold rounded-3xl shadow-2xl hover:scale-105 transition">
-                <PlayCircle className="w-12 h-12" />
-                Watch Today’s Charisma Video
-              </a>
-            </div>
-          )}
         </div>
       </div>
     </div>
