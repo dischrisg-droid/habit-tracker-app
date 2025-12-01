@@ -1,4 +1,4 @@
-// app/ai-coach/page.tsx — FINAL & ALWAYS FULL PLANS (NO FALLBACKS)
+// app/ai-coach/page.tsx — GROK AI (FULL PLANS WITH YOUR KEY)
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -9,7 +9,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function AICoachPage() {
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('Generating your personalized plan...');
+  const [plan, setPlan] = useState('Generating your plan with Grok...');
   const [video, setVideo] = useState('');
 
   useEffect(() => {
@@ -21,8 +21,6 @@ export default function AICoachPage() {
     const todayLog = logs[logs.length - 1];
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
     const vision = personality.whoIWantToBe || 'your highest self';
-    const completed = todayLog.completedHabits?.length || 0;
-    const total = habits.length;
 
     // Fresh videos
     const videoMap: Record<string, string> = {
@@ -32,70 +30,40 @@ export default function AICoachPage() {
       ENFP: 'https://www.youtube.com/watch?v=uPJTfshToOU',
       ENFJ: 'https://www.youtube.com/watch?v=WAGUSdZaE6c',
     };
-    const videoRec = videoMap[mbti] || 'https://www.youtube.com/watch?v=lVzxRVxIaxQ';
-    setVideo(videoRec);
+    setVideo(videoMap[mbti] || 'https://www.youtube.com/watch?v=lVzxRVxIaxQ');
 
-    // Always generate a full plan (fallback + AI attempt)
-    const fallbackPlan = `
-**Tomorrow belongs to ${mbti} becoming:** "${vision}"
-
-You completed ${completed}/${total} habits today — proud of you.
-
-**Your 6 Higher Faculties Plan**
-
-• Imagination — 7-minute visualization of your future self on waking  
-• Will — Do your most important habit first — no negotiation  
-• Perception — 3× tomorrow: fully notice one thing with all senses  
-• Reason — Protect your bedtime like it’s sacred  
-• Memory — Before sleep: write one moment that made you feel alive  
-• Intuition — Follow any body signal within 5 seconds
-
-**Daily Charisma Study**  
-Watch this to study presence & eye contact: ${videoRec}
-
-You are becoming magnetic. Keep going.`;
-
-    setPlan(fallbackPlan.trim());
-
-    // Try AI (optional — fallback always works)
-    const tryAI = async () => {
-      try {
-        const res = await fetch('/api/ai-plan', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [{
-              role: 'system',
-              content: `You are a world-class coach for a ${mbti} who wants to become: "${vision}".
-Today they completed ${completed}/${total} habits.
+    const callAI = async () => {
+      const res = await fetch('/api/ai-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{
+            role: 'system',
+            content: `You are Grok, a witty, helpful coach for a ${mbti} 6w5 who wants to become: "${vision}".
+Today they completed ${todayLog.completedHabits?.length || 0}/${habits.length} habits.
 Journal: "${todayLog.reflection || 'none'}"
 Reframed: "${todayLog.reframed || 'none'}"
 
-Give a beautiful tomorrow plan using the 6 Higher Faculties.
+Give a beautiful tomorrow plan using the 6 Higher Faculties (Imagination, Will, Perception, Intuition, Memory, Reason).
 One short activity per faculty.
-End with 1–2 new habit ideas.
-Tone: warm, wise, encouraging. Max 400 words.`
-            }]
-          }),
-        });
+End with 1–2 perfect new habit ideas.
+Tone: warm, wise, encouraging, with a touch of humor. Max 400 words.`
+          }]
+        }),
+      });
 
-        const data = await res.json();
-        if (data.choices?.[0]?.message?.content) {
-          const aiPlan = data.choices[0].message.content.trim();
-          setPlan(aiPlan);
-        }
-      } catch (err) {
-        // fallback already set, so do nothing
-      }
+      const data = await res.json();
+      const aiPlan = data.choices?.[0]?.message?.content || 'You are becoming legendary.';
+
+      setPlan(aiPlan.trim());
+      saveAIPlan?.({
+        date: new Date().toISOString().split('T')[0],
+        plan: aiPlan.trim(),
+        video: videoMap[mbti] || 'https://www.youtube.com/watch?v=lVzxRVxIaxQ',
+      });
     };
 
-    tryAI();
-
-    saveAIPlan?.({
-      date: new Date().toISOString().split('T')[0],
-      plan: fallbackPlan.trim(),
-      video: videoRec,
-    });
+    callAI();
   }, [personality, habits, logs, saveAIPlan]);
 
   return (
@@ -106,7 +74,7 @@ Tone: warm, wise, encouraging. Max 400 words.`
             <ArrowLeft className="w-7 h-7 text-white" />
           </Link>
           <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
-            Your AI Coach
+            Your AI Coach (Grok)
           </h1>
         </div>
       </div>
