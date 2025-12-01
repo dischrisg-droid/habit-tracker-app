@@ -1,4 +1,4 @@
-// app/api/ai-plan/route.ts — FINAL & ONLY VERSION (GROK API)
+// app/api/ai-plan/route.ts — GROK 4.1 (CURRENT MODEL)
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
         Authorization: `Bearer ${process.env.GROK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'grok-beta',
+        model: 'grok-4-1-fast', // Current model (as of Dec 2025)
         messages,
         max_tokens: 500,
         temperature: 0.8,
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Grok API error:', data);
+      console.error('Grok error:', data);
       return NextResponse.json({ error: data.error?.message || 'Grok API error' }, { status: 500 });
     }
 
