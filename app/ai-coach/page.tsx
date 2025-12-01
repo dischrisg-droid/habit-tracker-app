@@ -1,15 +1,24 @@
-// app/ai-coach/page.tsx — NO VIDEO LINK, AI RECOMMENDS VIDEO + READING
+// app/ai-coach/page.tsx — FINAL WITH GORGEOUS ICONS (exactly like your screenshot)
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useEffect, useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Brain, Target, Eye, Zap, MessageCircle, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
+const faculties = [
+  { name: 'Imagination', icon: Brain, color: 'from-purple-500 to-pink-500' },
+  { name: 'Will', icon: Target, color: 'from-orange-500 to-red-500' },
+  { name: 'Perception', icon: Eye, color: 'from-cyan-500 to-blue-500' },
+  { name: 'Intuition', icon: Zap, color: 'from-yellow-400 to-orange-500' },
+  { name: 'Memory', icon: MessageCircle, color: 'from-green-500 to-emerald-500' },
+  { name: 'Reason', icon: Heart, color: 'from-purple-500 to-indigo-600' },
+];
+
 export default function AICoachPage() {
   const { personality, habits, logs, saveAIPlan } = useStore();
-  const [plan, setPlan] = useState('Generating your perfect tomorrow...');
+  const [plan, setPlan] = useState('Generating your personalized plan...');
 
   useEffect(() => {
     if (!personality || !logs || logs.length === 0) {
@@ -19,6 +28,7 @@ export default function AICoachPage() {
 
     const todayLog = logs[logs.length - 1];
     const mbti = personality.mbti?.toUpperCase() || 'UNKNOWN';
+    const vision = personality.whoIWantToBe || 'your highest self';
 
     const callAI = async () => {
       const res = await fetch('/api/ai-plan', {
@@ -27,18 +37,15 @@ export default function AICoachPage() {
         body: JSON.stringify({
           messages: [{
             role: 'system',
-            content: `You are a world-class coach for a ${mbti} 6w5 who wants to become: "${personality.whoIWantToBe}".
+            content: `You are a world-class coach for a ${mbti} 6w5 who wants to become: "${vision}".
 Today they completed ${todayLog.completedHabits?.length || 0}/${habits.length} habits.
 Journal: "${todayLog.reflection || 'none'}"
 Reframed: "${todayLog.reframed || 'none'}"
 
 Give a beautiful tomorrow plan using the 6 Higher Faculties (Imagination, Will, Perception, Intuition, Memory, Reason).
 One short activity per faculty.
-Then recommend:
-• One specific 5–15 minute YouTube video to study charisma today (include exact title + link)
-• One 5–10 minute article or short reading on personal growth or faith (include title + link)
-
-Tone: warm, wise, encouraging, slightly playful. Max 450 words.`
+End with 1–2 perfect new habit ideas.
+Tone: warm, wise, encouraging, slightly playful. Max 400 words.`
           }]
         }),
       });
@@ -75,6 +82,20 @@ Tone: warm, wise, encouraging, slightly playful. Max 450 words.`
           <pre className="whitespace-pre-wrap font-sans text-lg leading-relaxed text-gray-800">
             {plan}
           </pre>
+        </div>
+
+        {/* BEAUTIFUL 6 FACULTIES — EXACTLY LIKE YOUR SCREENSHOT */}
+        <div className="mt-16">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-8">
+            {faculties.map((f) => (
+              <div key={f.name} className="text-center">
+                <div className={`w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br ${f.color} flex items-center justify-center shadow-2xl transform hover:scale-110 transition`}>
+                  <f.icon className="w-12 h-12 text-white" />
+                </div>
+                <p className="mt-4 text-lg font-bold text-gray-700">{f.name}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
