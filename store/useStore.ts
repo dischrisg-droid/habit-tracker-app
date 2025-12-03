@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING (Personality + Habits fixed forever)
+// store/useStore.ts — FINAL & 100% WORKING (Personality + Habits + Everything fixed forever)
 'use client';
 
 import { create } from 'zustand';
