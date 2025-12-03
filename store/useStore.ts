@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING (Personality saves forever)
+// store/useStore.ts — FINAL & 100% WORKING
 'use client';
 
 import { create } from 'zustand';
@@ -75,7 +75,7 @@ export const useStore = create<Store>((set, get) => ({
     if (user) {
       await get().load();
 
-      // Auto-add starter habits on first login
+      // Starter habits on first login
       if (get().habits.length === 0) {
         const starterHabits = [
           { name: "Drink 2L water", icon: "Droplets" },
@@ -118,12 +118,11 @@ export const useStore = create<Store>((set, get) => ({
       .select('*')
       .eq('user_id', user.id);
 
-    // THIS WAS THE BUG — table is called "personality", not "profile"
     const { data: personality } = await supabase
       .from('personality')
       .select('*')
       .eq('user_id', user.id)
-      .maybeSingle();
+      .maybeSingle();   // ← critical for loading correctly
 
     const { data: aiPlans } = await supabase
       .from('ai_plans')
