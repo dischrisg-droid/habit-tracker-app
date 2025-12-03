@@ -220,26 +220,30 @@ export const useStore = create<Store>((set, get) => ({
       date: plan.date,
       plan: plan.plan,
       video: plan.video || '',
-      user_id: user.id, // ← FIXED: was userId → now matches your table
+      user_id: user.id, // ← exact column name from your table
     };
 
-    const { error } = await supabase
+    // Remove onConflict — just insert or update manually
+    const { data: existing } = await supabase
       .from('ai_plans')
-      .upsert(payload, { onConflict: 'user_id,date' });
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('date', plan.date)
+      .maybeSingle();
 
-    if (error) {
-      console.error('AI plan save failed:', error);
-      return;
+    if (existing) {
+      await supabase.from('ai_plans').update(payload).eq('id', existing.id);
+    } else {
+      await supabase.from('ai_plans').insert(payload);
     }
 
     set(state => ({
-      aiPlans: [
-        ...state.aiPlans.filter(p => p.date !== plan.date),
-        plan,
-      ],
+      aiPlans: [...state.aiPlans.filter(p => !(p.date === plan.date)), plan],
+
     }));
   },
 }));
+
 
 
 
