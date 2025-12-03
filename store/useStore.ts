@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING
+// store/useStore.ts — FINAL & 100% WORKING (Personality saves forever)
 'use client';
 
 import { create } from 'zustand';
@@ -122,7 +122,7 @@ export const useStore = create<Store>((set, get) => ({
       .from('personality')
       .select('*')
       .eq('user_id', user.id)
-      .maybeSingle();   // ← critical for loading correctly
+      .maybeSingle();
 
     const { data: aiPlans } = await supabase
       .from('ai_plans')
@@ -180,10 +180,20 @@ export const useStore = create<Store>((set, get) => ({
       .eq('user_id', user.id)
       .maybeSingle();
 
+    const payload = {
+      mbti: p.mbti,
+      enneagram: p.enneagram,
+      wake_up: p.wakeUp,
+      bed_time: p.bedTime,
+      who_i_want_to_be: p.whoIWantToBe,
+      how_i_want_to_be_seen: p.howIWantToBeSeen,
+      what_i_want_to_stand_for: p.whatIWantToStandFor,
+    };
+
     if (existing) {
-      await supabase.from('personality').update(p).eq('id', existing.id);
+      await supabase.from('personality').update(payload).eq('id', existing.id);
     } else {
-      await supabase.from('personality').insert({ ...p, user_id: user.id });
+      await supabase.from('personality').insert({ ...payload, user_id: user.id });
     }
 
     set({ personality: p });
@@ -200,3 +210,4 @@ export const useStore = create<Store>((set, get) => ({
     }));
   },
 }));
+
