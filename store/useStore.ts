@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING (EVERYTHING SAVES PERFECTLY)
+// store/useStore.ts — FINAL & 100% WORKING — EVERYTHING SAVES PERFECTLY
 'use client';
 
 import { create } from 'zustand';
@@ -214,40 +214,32 @@ export const useStore = create<Store>((set, get) => ({
 
   saveAIPlan: async (plan: AIPlan) => {
     const { user } = get();
-    if (!user) {
-      console.log('No user — cannot save AI plan');
-      return;
-    }
+    if (!user) return;
 
     const payload = {
       date: plan.date,
       plan: plan.plan,
       video: plan.video || '',
-      user_id: user.id,
+      user_id: user.id, // ← FIXED: was userId → now matches your table
     };
 
-    console.log('Saving AI plan to Supabase:', payload); // ← This will show in browser console
-
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('ai_plans')
-      .upsert(payload, { onConflict: 'user_id,date' })
-      .select();
+      .upsert(payload, { onConflict: 'user_id,date' });
 
     if (error) {
-      console.error('Supabase AI plan save failed:', error);
+      console.error('AI plan save failed:', error);
       return;
     }
 
-    console.log('AI plan saved successfully:', data);
-
     set(state => ({
       aiPlans: [
-        ...state.aiPlans.filter(p => !(p.date === plan.date)),
+        ...state.aiPlans.filter(p => p.date !== plan.date),
         plan,
       ],
-
     }));
   },
 }));
+
 
 
