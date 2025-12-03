@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING (matches your exact Supabase schema)
+// store/useStore.ts — FINAL & 100% WORKING (matches your exact Supabase schema from screenshots)
 'use client';
 
 import { create } from 'zustand';
@@ -154,8 +154,8 @@ export const useStore = create<Store>((set, get) => ({
       date: log.date,
       completed_habits: log.completedHabits || [],
       extra_habits: log.extraHabits || [],
-      reflection: log.reflection,
-      reframed: log.reframed,
+      reflection: log.reflection || '',
+      reframed: log.reframed || '',
     };
 
     const { data: existing } = await supabase
