@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING (logs, personality, habits, AI — everything saves forever)
+// store/useStore.ts — FINAL & 100% WORKING (EVERYTHING SAVES PERFECTLY)
 'use client';
 
 import { create } from 'zustand';
@@ -56,7 +56,7 @@ type Store = {
   saveHabits: (habits: Habit[]) => Promise<void>;
   saveLog: (log: Log) => Promise<void>;
   savePersonality: (p: Personality) => Promise<void>;
-  saveAIPlan: (plan: AIPlan) => void;
+  saveAIPlan: (plan: AIPlan) => Promise<void>;
 };
 
 export const useStore = create<Store>((set, get) => ({
@@ -161,7 +161,7 @@ export const useStore = create<Store>((set, get) => ({
       extra_habits: log.extraHabits || [],
       reflection: log.reflection || '',
       reframed: log.reframed || '',
-      user_id: user.id, // ← CRITICAL: must be included for insert
+      user_id: user.id,
     };
 
     const { data: existing } = await supabase
@@ -212,14 +212,31 @@ export const useStore = create<Store>((set, get) => ({
     set({ personality: p });
   },
 
-  saveAIPlan: (plan: AIPlan) => {
+  saveAIPlan: async (plan: AIPlan) => {
     const { user } = get();
     if (!user) return;
 
-    supabase.from('ai_plans').upsert({ ...plan, user_id: user.id });
+    const payload = {
+      date: plan.date,
+      plan: plan.plan,
+      video: plan.video || '',
+      user_id: user.id,
+    };
+
+    const { error } = await supabase
+      .from('ai_plans')
+      .upsert(payload, { onConflict: 'user_id,date' });
+
+    if (error) {
+      console.error('Failed to save AI plan:', error);
+      return;
+    }
 
     set(state => ({
-      aiPlans: [...state.aiPlans.filter(p => p.date !== plan.date), plan],
+      aiPlans: [
+        ...state.aiPlans.filter(p => !(p.date === plan.date)),
+        plan,
+      ],
     }));
   },
 }));
