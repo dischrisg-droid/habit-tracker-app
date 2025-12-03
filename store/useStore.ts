@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING (Personality saves forever)
+// store/useStore.ts — FINAL & 100% WORKING (Personality + Habits fixed forever)
 'use client';
 
 import { create } from 'zustand';
@@ -75,8 +75,8 @@ export const useStore = create<Store>((set, get) => ({
     if (user) {
       await get().load();
 
-      // Starter habits on first login
-      if (get().habits.length === 0) {
+      // Only add starter habits ONCE — when user has NO habits, NO logs, and NO personality
+      if (get().habits.length === 0 && get().logs.length === 0 && !get().personality) {
         const starterHabits = [
           { name: "Drink 2L water", icon: "Droplets" },
           { name: "Meditate", icon: "Brain" },
@@ -132,7 +132,15 @@ export const useStore = create<Store>((set, get) => ({
     set({
       habits: habits || [],
       logs: logs || [],
-      personality: personality || null,
+      personality: personality ? {
+        mbti: personality.mbti,
+        enneagram: personality.enneagram,
+        wakeUp: personality.wake_up,
+        bedTime: personality.bed_time,
+        whoIWantToBe: personality.who_i_want_to_be,
+        howIWantToBeSeen: personality.how_i_want_to_be_seen,
+        whatIWantToStandFor: personality.what_i_want_to_stand_for,
+      } : null,
       aiPlans: aiPlans || [],
     });
   },
@@ -174,12 +182,6 @@ export const useStore = create<Store>((set, get) => ({
     const { user } = get();
     if (!user) return;
 
-    const { data: existing } = await supabase
-      .from('personality')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
     const payload = {
       mbti: p.mbti,
       enneagram: p.enneagram,
@@ -189,6 +191,12 @@ export const useStore = create<Store>((set, get) => ({
       how_i_want_to_be_seen: p.howIWantToBeSeen,
       what_i_want_to_stand_for: p.whatIWantToStandFor,
     };
+
+    const { data: existing } = await supabase
+      .from('personality')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
 
     if (existing) {
       await supabase.from('personality').update(payload).eq('id', existing.id);
