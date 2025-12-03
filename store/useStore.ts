@@ -160,6 +160,14 @@ export const useStore = create<Store>((set, get) => ({
     const { user } = get();
     if (!user) return;
 
+    const payload = {
+      date: log.date,
+      completed_habits: log.completedHabits,
+      extra_habits: log.extraHabits || [],
+      reflection: log.reflection,
+      reframed: log.reframed,
+    };
+
     const { data: existing } = await supabase
       .from('logs')
       .select('id')
@@ -168,13 +176,13 @@ export const useStore = create<Store>((set, get) => ({
       .maybeSingle();
 
     if (existing) {
-      await supabase.from('logs').update(log).eq('id', existing.id);
+      await supabase.from('logs').update(payload).eq('id', existing.id);
     } else {
-      await supabase.from('logs').insert({ ...log, user_id: user.id });
+      await supabase.from('logs').insert({ ...payload, user_id: user.id });
     }
 
     set(state => ({
-      logs: [...state.logs.filter(l => l.date !== log.date), log],
+      logs: [...state.logs.filter(l => l.date !== log.date), { ...log, user_id: user.id }],
     }));
   },
 
@@ -218,4 +226,5 @@ export const useStore = create<Store>((set, get) => ({
     }));
   },
 }));
+
 
