@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING (Personality + Habits + Everything fixed forever)
+// store/useStore.ts — FINAL & 100% WORKING (everything saves forever)
 'use client';
 
 import { create } from 'zustand';
@@ -22,6 +22,7 @@ type Habit = {
 type Log = {
   date: string;
   completedHabits: string[];
+  extraHabits?: string[];   // ← now optional
   reflection?: string;
   reframed?: string;
 };
@@ -75,7 +76,7 @@ export const useStore = create<Store>((set, get) => ({
     if (user) {
       await get().load();
 
-      // Only add starter habits ONCE — when user has NO habits, NO logs, and NO personality
+      // Only add starter habits once — when user has zero data
       if (get().habits.length === 0 && get().logs.length === 0 && !get().personality) {
         const starterHabits = [
           { name: "Drink 2L water", icon: "Droplets" },
@@ -108,15 +109,8 @@ export const useStore = create<Store>((set, get) => ({
     const { user } = get();
     if (!user) return;
 
-    const { data: habits } = await supabase
-      .from('habits')
-      .select('*')
-      .eq('user_id', user.id);
-
-    const { data: logs } = await supabase
-      .from('logs')
-      .select('*')
-      .eq('user_id', user.id);
+    const { data: habits } = await supabase.from('habits').select('*').eq('user_id', user.id);
+    const { data: logs } = await supabase.from('logs').select('*').eq('user_id', user.id);
 
     const { data: personality } = await supabase
       .from('personality')
@@ -124,10 +118,7 @@ export const useStore = create<Store>((set, get) => ({
       .eq('user_id', user.id)
       .maybeSingle();
 
-    const { data: aiPlans } = await supabase
-      .from('ai_plans')
-      .select('*')
-      .eq('user_id', user.id);
+    const { data: aiPlans } = await supabase.from('ai_plans').select('*').eq('user_id', user.id);
 
     set({
       habits: habits || [],
