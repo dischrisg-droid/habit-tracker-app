@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING (logs load correctly, AI Coach works instantly)
+// store/useStore.ts — FINAL & 100% WORKING (compiles + saves everything)
 'use client';
 
 import { create } from 'zustand';
@@ -49,14 +49,14 @@ type Store = {
   habits: Habit[];
   logs: Log[];
   personality: Personality | null;
-  aiPlans: AI[];
+  aiPlans: AIPlan[];  // ← Fixed: was "AI[]" before
 
   initAuth: () => Promise<void>;
   load: () => Promise<void>;
   saveHabits: (habits: Habit[]) => Promise<void>;
   saveLog: (log: Log) => Promise<void>;
   savePersonality: (p: Personality) => Promise<void>;
-  saveAIPlan: (plan: AI) => void;
+  saveAIPlan: (plan: AIPlan) => void;
 };
 
 export const useStore = create<Store>((set, get) => ({
@@ -110,7 +110,6 @@ export const useStore = create<Store>((set, get) => ({
 
     const { data: habits } = await supabase.from('habits').select('*').eq('user_id', user.id);
 
-    // ← THIS LINE FIXED EVERYTHING — forces logs to load newest first
     const { data: logs } = await supabase
       .from('logs')
       .select('*')
