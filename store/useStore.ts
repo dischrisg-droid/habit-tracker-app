@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING (everything saves forever)
+// store/useStore.ts — FINAL & 100% WORKING (matches your exact Supabase schema)
 'use client';
 
 import { create } from 'zustand';
@@ -22,7 +22,7 @@ type Habit = {
 type Log = {
   date: string;
   completedHabits: string[];
-  extraHabits?: string[];   // ← now optional
+  extraHabits?: string[];
   reflection?: string;
   reframed?: string;
 };
@@ -76,7 +76,6 @@ export const useStore = create<Store>((set, get) => ({
     if (user) {
       await get().load();
 
-      // Only add starter habits once — when user has zero data
       if (get().habits.length === 0 && get().logs.length === 0 && !get().personality) {
         const starterHabits = [
           { name: "Drink 2L water", icon: "Droplets" },
@@ -126,8 +125,8 @@ export const useStore = create<Store>((set, get) => ({
       personality: personality ? {
         mbti: personality.mbti,
         enneagram: personality.enneagram,
-        wakeUp: personality.wake_up,
-        bedTime: personality.bed_time,
+        wakeUp: personality.wakeup,
+        bedTime: personality.bedtime,
         whoIWantToBe: personality.who_i_want_to_be,
         howIWantToBeSeen: personality.how_i_want_to_be_seen,
         whatIWantToStandFor: personality.what_i_want_to_stand_for,
@@ -153,7 +152,7 @@ export const useStore = create<Store>((set, get) => ({
 
     const payload = {
       date: log.date,
-      completed_habits: log.completedHabits,
+      completed_habits: log.completedHabits || [],
       extra_habits: log.extraHabits || [],
       reflection: log.reflection,
       reframed: log.reframed,
@@ -173,7 +172,7 @@ export const useStore = create<Store>((set, get) => ({
     }
 
     set(state => ({
-      logs: [...state.logs.filter(l => l.date !== log.date), { ...log, user_id: user.id }],
+      logs: [...state.logs.filter(l => l.date !== log.date), log],
     }));
   },
 
@@ -184,8 +183,8 @@ export const useStore = create<Store>((set, get) => ({
     const payload = {
       mbti: p.mbti,
       enneagram: p.enneagram,
-      wake_up: p.wakeUp,
-      bed_time: p.bedTime,
+      wakeup: p.wakeUp,
+      bedtime: p.bedTime,
       who_i_want_to_be: p.whoIWantToBe,
       how_i_want_to_be_seen: p.howIWantToBeSeen,
       what_i_want_to_stand_for: p.whatIWantToStandFor,
@@ -217,5 +216,3 @@ export const useStore = create<Store>((set, get) => ({
     }));
   },
 }));
-
-
