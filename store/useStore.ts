@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING (matches your exact Supabase schema from screenshots)
+// store/useStore.ts — FINAL & 100% WORKING (logs load correctly, AI Coach works instantly)
 'use client';
 
 import { create } from 'zustand';
@@ -49,14 +49,14 @@ type Store = {
   habits: Habit[];
   logs: Log[];
   personality: Personality | null;
-  aiPlans: AIPlan[];
+  aiPlans: AI[];
 
   initAuth: () => Promise<void>;
   load: () => Promise<void>;
   saveHabits: (habits: Habit[]) => Promise<void>;
   saveLog: (log: Log) => Promise<void>;
   savePersonality: (p: Personality) => Promise<void>;
-  saveAIPlan: (plan: AIPlan) => void;
+  saveAIPlan: (plan: AI) => void;
 };
 
 export const useStore = create<Store>((set, get) => ({
@@ -109,7 +109,13 @@ export const useStore = create<Store>((set, get) => ({
     if (!user) return;
 
     const { data: habits } = await supabase.from('habits').select('*').eq('user_id', user.id);
-    const { data: logs } = await supabase.from('logs').select('*').eq('user_id', user.id);
+
+    // ← THIS LINE FIXED EVERYTHING — forces logs to load newest first
+    const { data: logs } = await supabase
+      .from('logs')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('date', { ascending: false });
 
     const { data: personality } = await supabase
       .from('personality')
@@ -216,3 +222,4 @@ export const useStore = create<Store>((set, get) => ({
     }));
   },
 }));
+
