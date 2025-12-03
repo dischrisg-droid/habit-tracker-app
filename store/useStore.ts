@@ -214,7 +214,10 @@ export const useStore = create<Store>((set, get) => ({
 
   saveAIPlan: async (plan: AIPlan) => {
     const { user } = get();
-    if (!user) return;
+    if (!user) {
+      console.log('No user — cannot save AI plan');
+      return;
+    }
 
     const payload = {
       date: plan.date,
@@ -223,21 +226,28 @@ export const useStore = create<Store>((set, get) => ({
       user_id: user.id,
     };
 
-    const { error } = await supabase
+    console.log('Saving AI plan to Supabase:', payload); // ← This will show in browser console
+
+    const { data, error } = await supabase
       .from('ai_plans')
-      .upsert(payload, { onConflict: 'user_id,date' });
+      .upsert(payload, { onConflict: 'user_id,date' })
+      .select();
 
     if (error) {
-      console.error('Failed to save AI plan:', error);
+      console.error('Supabase AI plan save failed:', error);
       return;
     }
+
+    console.log('AI plan saved successfully:', data);
 
     set(state => ({
       aiPlans: [
         ...state.aiPlans.filter(p => !(p.date === plan.date)),
         plan,
       ],
+
     }));
   },
 }));
+
 
