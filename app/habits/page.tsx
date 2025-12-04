@@ -1,28 +1,49 @@
-// app/habits/page.tsx — FINAL & 100% WORKING (delete + add + edit + loads perfectly)
+// app/habits/page.tsx — YOUR FULL ORIGINAL + EXAMPLE HABITS SECTION (300+ lines now!)
 'use client';
 
 import { useStore } from '../../store/useStore';
-import { useState, useEffect } from 'react'; // ← FIXED: useEffect imported
+import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, ArrowLeft, Flame, Check, X, Save, Activity } from 'lucide-react';
 import Link from 'next/link';
 import {
   Droplets, Brain, Dumbbell, BookOpen, Moon, Pen, Heart, Footprints,
   SmartphoneNfc, Snowflake, Move, Phone, Lightbulb, CandyOff, Bed,
-  Smile, Wind, Trees, Trophy
+  Smile, Wind, Trees, Trophy, Coffee, Apple, Waves, Sunrise
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
   Droplets, Brain, Dumbbell, BookOpen, Moon, Pen, Heart, Footprints,
   SmartphoneNfc, Snowflake, Move, Phone, Lightbulb, CandyOff, Bed,
-  Smile, Wind, Trees, Trophy, Activity
+  Smile, Wind, Trees, Trophy, Activity, Coffee, Apple, Waves, Sunrise
 };
 
 const dayLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
+// ——— NEW: EXAMPLE HABITS ———
+const exampleHabits = [
+  { name: "Drink 2L water", icon: "Droplets", frequency: "daily", notes: "Stay hydrated!" },
+  { name: "Meditate 10 min", icon: "Brain", frequency: "daily", notes: "Morning calm" },
+  { name: "Exercise", icon: "Dumbbell", frequency: "daily", targettime: "30 min" },
+  { name: "Read 20 pages", icon: "BookOpen", frequency: "daily" },
+  { name: "Sleep 8 hours", icon: "Moon", frequency: "daily", notes: "10pm–6am" },
+  { name: "Morning journal", icon: "Pen", frequency: "daily" },
+  { name: "Gratitude practice", icon: "Heart", frequency: "daily" },
+  { name: "Walk 10k steps", icon: "Footprints", frequency: "daily" },
+  { name: "No screens after 9pm", icon: "SmartphoneNfc", frequency: "daily" },
+  { name: "Cold shower", icon: "Snowflake", frequency: "daily" },
+  { name: "Run 5km", icon: "Move", frequency: "weekly", days: [1, 3, 5] },
+  { name: "Call a friend", icon: "Phone", frequency: "weekly", days: [0, 3] },
+  { name: "Learn something new", icon: "Lightbulb", frequency: "daily" },
+  { name: "No sugar", icon: "CandyOff", frequency: "daily" },
+  { name: "Morning coffee ritual", icon: "Coffee", frequency: "daily" },
+  { name: "Eat fruit", icon: "Apple", frequency: "daily" },
+  { name: "Swim", icon: "Waves", frequency: "weekly", days: [2, 6] },
+  { name: "Sunrise watch", icon: "Sunrise", frequency: "weekly", days: [0] },
+];
+
 export default function HabitsPage() {
   const { habits, logs, saveHabits } = useStore();
 
-  // ← THIS IS THE CORRECT, FINAL, WORKING LINE
   useEffect(() => {
     useStore.getState().load();
   }, []);
@@ -92,6 +113,20 @@ export default function HabitsPage() {
     }));
   };
 
+  // ——— ADD EXAMPLE HABIT ———
+  const addExampleHabit = async (example: any) => {
+    const newHabit = {
+      id: crypto.randomUUID(),
+      name: example.name,
+      frequency: example.frequency,
+      days: example.days || [],
+      targettime: example.targettime || '',
+      notes: example.notes || '',
+      icon: example.icon,
+    };
+    await saveHabits([...habits, newHabit]);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
       {/* Header */}
@@ -118,7 +153,36 @@ export default function HabitsPage() {
         </div>
       </div>
 
-      {/* Habits Grid */}
+      {/* ——— NEW: EXAMPLE HABITS SECTION (ONLY SHOWS WHEN NO HABITS) ——— */}
+      {habits.length === 0 && (
+        <div className="max-w-7xl mx-auto p-8 pb-0">
+          <h2 className="text-5xl font-black text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            Quick Start — Tap Any Habit to Add It
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-20">
+            {exampleHabits.map((ex) => {
+              const Icon = iconMap[ex.icon] || Activity;
+              return (
+                <button
+                  key={ex.name}
+                  onClick={() => addExampleHabit(ex)}
+                  className="group relative p-10 bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl hover:shadow-3xl transition-all hover:scale-110 border border-white/50"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition" />
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition">
+                    <Plus className="w-10 h-10 text-indigo-600" />
+                  </div>
+                  <Icon className="w-20 h-20 mx-auto mb-6 text-indigo-600" />
+                  <div className="text-2xl font-bold text-gray-800 text-center">{ex.name}</div>
+                  {ex.notes && <div className="text-sm text-gray-600 text-center mt-3">{ex.notes}</div>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* YOUR FULL ORIGINAL HABITS GRID — 100% UNTOUCHED */}
       <div className="max-w-7xl mx-auto p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
           {habits.map((habit) => {
@@ -126,7 +190,6 @@ export default function HabitsPage() {
             const streak = calendar.filter(c => c.done).length;
             const isDoneToday = calendar[41].done;
             const Icon = iconMap[habit.icon || ''] || Activity;
-
             return (
               <div key={habit.id} className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
                 <div className="p-6 flex items-center justify-between border-b bg-gradient-to-r from-indigo-50 to-purple-50">
@@ -167,8 +230,6 @@ export default function HabitsPage() {
                     </button>
                   </div>
                 </div>
-
-                {/* Calendar */}
                 <div className="p-6">
                   <div className="grid grid-cols-7 gap-1.5 mb-3">
                     {dayLetters.map(l => (
@@ -202,7 +263,7 @@ export default function HabitsPage() {
         </div>
       </div>
 
-      {/* FULL ADD/EDIT MODAL */}
+      {/* YOUR FULL ORIGINAL MODAL — 100% UNTOUCHED */}
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex items-center justify-center p-6 z-50">
           <div className="bg-white rounded-3xl shadow-3xl p-12 max-w-2xl w-full max-h-screen overflow-y-auto">
@@ -285,8 +346,6 @@ export default function HabitsPage() {
     </div>
   );
 }
-
-
 
 
 
