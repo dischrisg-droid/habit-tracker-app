@@ -32,6 +32,10 @@ export default function HabitsPage() {
     icon: 'Activity',
   });
 
+useEffect(() => {
+  get().load(); // ← THIS LINE FIXES EVERYTHING
+}, []);
+  
   const today = new Date().toISOString().split('T')[0];
   const todayLog = logs.find(l => l.date === today);
   const completedHabits = todayLog?.completedHabits || [];
@@ -289,6 +293,7 @@ export default function HabitsPage() {
     </div>
   );
 }
+
 
 
 
