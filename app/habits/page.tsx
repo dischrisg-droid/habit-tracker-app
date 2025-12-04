@@ -43,7 +43,7 @@ export default function HabitsPage() {
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
       const log = logs.find(l => l.date === dateStr);
-      const done = (log as any)?.completed_habits?.includes(habitId) ?? false;
+      const done = (logs.find(l => l.date === date) as any)?.completed_habits?.includes(habit.id) ?? false;
       data.push({ done, isToday: i === 0, date });
     }
     return data;
@@ -288,5 +288,6 @@ export default function HabitsPage() {
     </div>
   );
 }
+
 
 
