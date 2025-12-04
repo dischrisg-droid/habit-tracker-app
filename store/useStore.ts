@@ -99,7 +99,6 @@ export const useStore = create<Store>((set, get) => ({
 
     const { data: aiPlans } = await supabase.from('ai_plans').select('*').eq('user_id', user.id);
 
-    // Map snake_case → camelCase for the whole app
     const logs = (rawLogs || []).map(log => ({
       date: log.date,
       completedHabits: log.completed_habits || [],
@@ -109,7 +108,6 @@ export const useStore = create<Store>((set, get) => ({
     }));
 
     set({
-      set({
       habits: habits || [],
       logs,
       personality: personality ? {
