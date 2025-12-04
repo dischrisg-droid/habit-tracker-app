@@ -107,12 +107,8 @@ export const useStore = create<Store>((set, get) => ({
   },
 
   load: async () => {
-    // ← AUTO REFRESH SESSION IF EXPIRED (this fixes blank screen after a day)
-    const { data: { session } } = await supabase.auth.getSession();
-    const user = session?.user ?? get().user;
+    const { user } = get();
     if (!user) return;
-
-    set({ user });
 
     const { data: habits } = await supabase.from('habits').select('*').eq('user_id', user.id);
 
@@ -130,9 +126,16 @@ export const useStore = create<Store>((set, get) => ({
 
     const { data: aiPlans } = await supabase.from('ai_plans').select('*').eq('user_id', user.id);
 
+    // ← MAP SUPABASE SNAKE_CASE → YOUR CODE'S camelCase
+    const mappedLogs = logs?.map(log => ({
+      ...log,
+      completedHabits: log.completed_habits || [],
+      extraHabits: log.extra_habits || [],
+    })) || [];
+
     set({
       habits: habits || [],
-      logs: logs || [],
+      logs: mappedLogs,
       personality: personality ? {
         mbti: personality.mbti,
         enneagram: personality.enneagram,
@@ -146,6 +149,7 @@ export const useStore = create<Store>((set, get) => ({
     });
   },
 
+  
   saveHabits: async (habits: Habit[]) => {
     const { user } = get();
     if (!user) return;
@@ -247,6 +251,7 @@ export const useStore = create<Store>((set, get) => ({
     }));
   },
 }));
+
 
 
 
