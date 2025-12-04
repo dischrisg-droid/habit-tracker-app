@@ -39,9 +39,9 @@ const vision = personality?.who_i_want_to_be || 'your highest self';
           messages: [{
             role: 'system',
             content: `You are a world-class coach for a ${mbti} 6w5 who wants to become: "${vision}".
-Today they completed ${todayLog.completedHabits?.length || 0}/${habits.length} habits.
-Journal: "${todayLog.reflection || 'none'}"
-Reframed: "${todayLog.reframed || 'none'}"
+Today they completed ${todayLog?.completed_habits?.length || 0}/${habits.length} habits.
+Journal: "${todayLog?.reflection || 'none'}"
+Reframed: "${todayLog?.reframed || 'none'}"
 
 Give a beautiful tomorrow plan using the 6 Higher Faculties (Imagination, Will, Perception, Intuition, Memory, Reason).
 One short activity per faculty.
