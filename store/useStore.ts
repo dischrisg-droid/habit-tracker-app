@@ -99,16 +99,17 @@ export const useStore = create<Store>((set, get) => ({
 
     const { data: aiPlans } = await supabase.from('ai_plans').select('*').eq('user_id', user.id);
 
-    // ← FINAL FIX: map snake_case → camelCase AND match Log type exactly
+    // Map snake_case → camelCase for the whole app
     const logs = (rawLogs || []).map(log => ({
       date: log.date,
       completedHabits: log.completed_habits || [],
       extraHabits: log.extra_habits || [],
       reflection: log.reflection || '',
       reframed: log.reframed || '',
-    } as Log));
+    }));
 
     set({
+      set({
       habits: habits || [],
       logs,
       personality: personality ? {
@@ -209,9 +210,6 @@ export const useStore = create<Store>((set, get) => ({
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
-
-
-
 
 
 
