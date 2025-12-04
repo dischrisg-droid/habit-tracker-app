@@ -34,7 +34,8 @@ export default function HabitsPage() {
 
   const today = new Date().toISOString().split('T')[0];
   const todayLog = logs.find(l => l.date === today);
-  const completedHabits = todayLog?.completed_habits || [];
+  const completedHabits = todayLog?.completedHabits || [];
+  
 
   const getCalendarData = (habitId: string) => {
   const data = [];
@@ -43,7 +44,7 @@ export default function HabitsPage() {
     date.setDate(date.getDate() - i);
     const dateStr = date.toISOString().split('T')[0];
     const log = logs.find(l => l.date === dateStr);
-    const done = (log as any)?.completed_habits?.includes(habitId) ?? false;
+    const done = log?.completedHabits?.includes(habitId) ?? false;
     data.push({ done, isToday: i === 0, date });
   }
   return data;
@@ -288,6 +289,7 @@ export default function HabitsPage() {
     </div>
   );
 }
+
 
 
 
