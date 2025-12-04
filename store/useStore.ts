@@ -138,14 +138,14 @@ export const useStore = create<Store>((set, get) => ({
       habits: habits || [],
       logs,
       personality: personality ? {
-        mbti: personality.mbti,
-        enneagram: personality.enneagram,
-        wakeUp: personality.wakeup,
-        bedTime: personality.bedtime,
-        whoIWantToBe: personality.who_i_want_to_be,
-        howIWantToBeSeen: personality.how_i_want_to_be_seen,
-        whatIWantToStandFor: personality.what_i_want_to_stand_for,
-      } : null,
+  mbti: personality.mbti,
+  enneagram: personality.enneagram,
+  wakeUp: personality.wakeup,
+  bedTime: personality.bedtime,
+  whoIWantToBe: personality.who_i_want_to_be,
+  howIWantToBeSeen: personality.how_i_want_to_be_seen,
+  whatIWantToStandFor: personality.what_i_want_to_stand_for,
+} : null,
       aiPlans: aiPlans || [],
     });
   },
@@ -196,16 +196,16 @@ export const useStore = create<Store>((set, get) => ({
     const { user } = get();
     if (!user) return;
 
-    const payload = {
-      mbti: p.mbti,
-      enneagram: p.enneagram,
-      wakeup: p.wakeUp,
-      bedtime: p.bedTime,
-      who_i_want_to_be: p.whoIWantToBe,
-      how_i_want_to_be_seen: p.howIWantToBeSeen,
-      what_i_want_to_stand_for: p.whatIWantToStandFor,
-      user_id: user.id,
-    };
+const payload = {
+  mbti: p.mbti,
+  enneagram: p.enneagram,
+  wakeup: p.wakeUp,
+  bedtime: p.bedTime,
+  who_i_want_to_be: p.whoIWantToBe,
+  how_i_want_to_be_seen: p.howIWantToBeSeen,
+  what_i_want_to_stand_for: p.whatIWantToStandFor,
+  user_id: user.id,
+};
 
     const { data: existing } = await supabase
       .from('personality')
@@ -240,6 +240,7 @@ export const useStore = create<Store>((set, get) => ({
     if (error) console.error('AI plan save error:', error);
   },
 }));
+
 
 
 
