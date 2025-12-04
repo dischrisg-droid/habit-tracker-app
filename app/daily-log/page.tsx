@@ -29,12 +29,12 @@ export default function DailyLogPage() {
     
     // Auto-mark Journal complete if reflection or reframed is filled
     const journalDone = reflection.trim() || reframed.trim();
-    const updatedCompleted = [
-      ...new Set([
-        ...completedHabits,
-        ...(journalDone ? [JOURNAL_HABIT_ID] : []),
-      ])
-    ];
+const updatedCompleted = Array.from(
+  new Set([
+    ...completedHabits,
+    ...(journalDone ? [JOURNAL_HABIT_ID] : []),
+  ])
+);
 
     await saveLog({
       date: today,
