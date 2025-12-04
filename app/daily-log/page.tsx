@@ -1,11 +1,11 @@
-// app/daily-log/page.tsx — FINAL & PERFECT (NO ERRORS)
+// app/daily-log/page.tsx — FINAL WORKING VERSION (auto-marks Journal complete)
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useState } from 'react';
 import { Check, Sparkles, Flame, User } from 'lucide-react';
 import Link from 'next/link';
-import confetti from 'canvas-confetti'; // ← THIS IS THE CORRECT IMPORT
+import confetti from 'canvas-confetti';
 
 export default function DailyLogPage() {
   const { habits, logs, saveLog } = useStore();
@@ -22,18 +22,31 @@ export default function DailyLogPage() {
   const [reframed, setReframed] = useState(todayLog.reframed || '');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
+  const JOURNAL_HABIT_ID = "78eaa216-6a80-40d7-9f49-25a6a94768e5"; // ← YOUR JOURNAL ID FROM SCREENSHOT
+
   const handleSave = async () => {
     setSaveStatus('saving');
+    
+    // Auto-mark Journal complete if reflection or reframed is filled
+    const journalDone = reflection.trim() || reframed.trim();
+    const updatedCompleted = [
+      ...new Set([
+        ...completedHabits,
+        ...(journalDone ? [JOURNAL_HABIT_ID] : []),
+      ])
+    ];
+
     await saveLog({
       date: today,
-      completedHabits,
+      completedHabits: updatedCompleted,
       reflection,
       reframed,
     });
+
     setSaveStatus('saved');
     setTimeout(() => setSaveStatus('idle'), 3000);
 
-    if (completedHabits.length === habits.length && habits.length > 0) {
+    if (updatedCompleted.length === habits.length && habits.length > 0) {
       confetti({
         particleCount: 400,
         spread: 120,
@@ -77,14 +90,14 @@ export default function DailyLogPage() {
             value={reflection}
             onChange={(e) => setReflection(e.target.value)}
             rows={12}
-            className="w-full px-8 py-6 text-xl rounded-3xl border-2 border-indigo-200 focus:border-indigo-500 outline-none resize-none"
+            className="w-full px-8 py-6 text-xl rounded-3xl border-2 border-indigo-200 focus:border-indigo-500 outline-none resize-none font-medium"
           />
           <textarea
             placeholder="Reframed: How can you see today positively?"
             value={reframed}
             onChange={(e) => setReframed(e.target.value)}
             rows={4}
-            className="w-full px-8 py-6 text-xl rounded-3xl border-2 border-pink-200 focus:border-pink-500 outline-none resize-none mt-8"
+            className="w-full px-8 py-6 text-xl rounded-3xl border-2 border-pink-200 focus:border-pink-500 outline-none resize-none mt-8 font-medium"
           />
         </div>
 
