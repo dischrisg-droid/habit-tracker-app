@@ -137,7 +137,13 @@ export const useStore = create<Store>((set, get) => ({
 
     set({
       habits: habits || [],
-      logs: mappedLogs,
+      logs: logs?.map(log => ({
+        date: log.date,
+        completedHabits: log.completed_habits || [],
+        extraHabits: log.extra_habits || [],
+        reflection: log.reflection || '',
+        reframed: log.reframed || '',
+      })) || [],
       personality: personality ? {
         mbti: personality.mbti,
         enneagram: personality.enneagram,
@@ -149,8 +155,6 @@ export const useStore = create<Store>((set, get) => ({
       } : null,
       aiPlans: aiPlans || [],
     });
-  },
-
   
   saveHabits: async (habits: Habit[]) => {
     const { user } = get();
@@ -253,6 +257,7 @@ export const useStore = create<Store>((set, get) => ({
     }));
   },
 }));
+
 
 
 
