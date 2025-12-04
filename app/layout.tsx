@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -52,6 +53,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     href="/login"
                     className="px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition"
                   >
+                    <Link 
+  href="/history" 
+  className="p-3 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl shadow-xl hover:scale-105 transition"
+>
+  <Calendar className="w-7 h-7 text-white" />
+</Link>
                     Login
                   </Link>
                 )}
