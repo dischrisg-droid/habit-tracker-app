@@ -21,10 +21,12 @@ type Habit = {
 
 type Log = {
   date: string;
-  completedHabits: string[];
-  extraHabits?: string[];
+  completed_habits: string[];
+  extra_habits?: string[];
   reflection?: string;
   reframed?: string;
+  user_id?: string;
+  id?: string;
 };
 
 type Personality = {
@@ -251,6 +253,7 @@ export const useStore = create<Store>((set, get) => ({
     }));
   },
 }));
+
 
 
 
