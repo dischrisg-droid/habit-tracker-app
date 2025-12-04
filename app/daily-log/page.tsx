@@ -17,9 +17,9 @@ export default function DailyLogPage() {
     reframed: '',
   };
 
-  const [completedHabits, setCompletedHabits] = useState<string[]>(todayLog.completedHabits || []);
-  const [reflection, setReflection] = useState(todayLog.reflection || '');
-  const [reframed, setReframed] = useState(todayLog.reframed || '');
+  const [completedHabits, setCompletedHabits] = useState<string[]>(todayLog?.completed_habits || []);
+  const [reflection, setReflection] = useState(todayLog?.reflection || '');
+  const [reframed, setReframed] = useState(todayLog?.reframed || '');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   const JOURNAL_HABIT_ID = "78eaa216-6a80-40d7-9f49-25a6a94768e5"; // ← YOUR JOURNAL ID FROM SCREENSHOT
