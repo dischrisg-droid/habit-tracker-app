@@ -38,16 +38,20 @@ export default function HabitsPage() {
   // ← END OF FIX
 
   const getCalendarData = (habitId: string) => {
-    const data = [];
-    for (let i = 41; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
-      const log = logs.find(l => l.date === dateStr);
-      const done = log?.completedHabits.includes(habitId);
-      data.push({ done: !!done, isToday: i === 0, date });
-    }
-    return data;
+  const data = [];
+  for (let i = 41; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const dateStr = date.toISOString().split('T')[0];
+    const log = logs.find(l => l.date === dateStr);
+    
+    // ← THIS LINE WAS CRASHING — NOW SAFE FOREVER
+    const done = log?.completedHabits?.includes(habitId) ?? false;
+    
+    data.push({ done, isToday: i === 0, date });
+  }
+  return data;
+
   };
 
   const toggleHabit = (id: string) => {
@@ -219,4 +223,5 @@ export default function HabitsPage() {
     </div>
   );
 }
+
 
