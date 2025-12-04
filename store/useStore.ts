@@ -118,14 +118,6 @@ export const useStore = create<Store>((set, get) => ({
       .eq('user_id', user.id)
       .order('date', { ascending: false });
 
-    const logs = rawLogs?.map(log => ({
-      date: log.date,
-      completedHabits: log.completed_habits || [],
-      extraHabits: log.extra_habits || [],
-      reflection: log.reflection || '',
-      reframed: log.reframed || '',
-    })) || [];
-
     const { data: personality } = await supabase
       .from('personality')
       .select('*')
@@ -134,18 +126,27 @@ export const useStore = create<Store>((set, get) => ({
 
     const { data: aiPlans } = await supabase.from('ai_plans').select('*').eq('user_id', user.id);
 
+    // ← THIS IS THE FIX — map snake_case from Supabase to camelCase for the app
+    const logs = (rawLogs || []).map(log => ({
+      date: log.date,
+      completedHabits: log.completed_habits || [],
+      extraHabits: log.extra_habits || [],
+      reflection: log.reflection || '',
+      reframed: log.reframed || '',
+    }));
+
     set({
       habits: habits || [],
       logs,
       personality: personality ? {
-  mbti: personality.mbti,
-  enneagram: personality.enneagram,
-  wakeUp: personality.wakeup,
-  bedTime: personality.bedtime,
-  whoIWantToBe: personality.who_i_want_to_be,
-  howIWantToBeSeen: personality.how_i_want_to_be_seen,
-  whatIWantToStandFor: personality.what_i_want_to_stand_for,
-} : null,
+        mbti: personality.mbti,
+        enneagram: personality.enneagram,
+        wakeUp: personality.wakeup,
+        bedTime: personality.bedtime,
+        whoIWantToBe: personality.who_i_want_to_be,
+        howIWantToBeSeen: personality.how_i_want_to_be_seen,
+        whatIWantToStandFor: personality.what_i_want_to_stand_for,
+      } : null,
       aiPlans: aiPlans || [],
     });
   },
@@ -240,6 +241,7 @@ const payload = {
     if (error) console.error('AI plan save error:', error);
   },
 }));
+
 
 
 
