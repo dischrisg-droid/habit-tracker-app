@@ -24,7 +24,7 @@ export default function AICoachPage() {
     if (!personality || !logs || logs.length === 0) {
       setPlan('Please save today’s log first.');
       return;
-    }
+    } 
 
     const todayLog = logs[logs.length - 1];
     const mbti = personality?.mbti?.toUpperCase() || 'UNKNOWN';
