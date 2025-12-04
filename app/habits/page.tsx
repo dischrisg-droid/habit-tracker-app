@@ -3,6 +3,7 @@
 
 import { useStore } from '../../store/useStore';
 import { useState } from 'react';
+import { useEffect } from 'react';
 import { Plus, Edit2, Trash2, ArrowLeft, Flame, Check, X, Save, Activity } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -293,6 +294,7 @@ useEffect(() => {
     </div>
   );
 }
+
 
 
 
