@@ -29,7 +29,7 @@ export default function AICoachPage() {
     const todayLog = logs[logs.length - 1];
     const mbti = personality?.mbti?.toUpperCase() || 'UNKNOWN';
 // Only change this one line in your ai-coach/page.tsx
-const vision = personality?.who_i_want_to_be || 'your highest self';
+const vision = personality?.whoIWantToBe || 'your highest self';
 
     const callAI = async () => {
       const res = await fetch('/api/ai-plan', {
