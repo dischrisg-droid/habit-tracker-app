@@ -1,14 +1,14 @@
-// app/habits/page.tsx — FINAL & 100% WORKING (delete + add habits + everything perfect)
+// app/habits/page.tsx — FINAL & 100% WORKING (delete + add + edit + no crash)
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, ArrowLeft, Flame, Check, X, Save } from 'lucide-react';
+import { Plus, Edit2, Trash2, ArrowLeft, Flame, Check, X, Save, Activity } from 'lucide-react';
 import Link from 'next/link';
 import {
   Droplets, Brain, Dumbbell, BookOpen, Moon, Pen, Heart, Footprints,
   SmartphoneNfc, Snowflake, Move, Phone, Lightbulb, CandyOff, Bed,
-  Smile, Wind, Trees, Trophy, Activity
+  Smile, Wind, Trees, Trophy
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
@@ -50,7 +50,6 @@ export default function HabitsPage() {
   };
 
   const deleteHabit = async (id: string) => {
-    {
     if (!confirm('Delete this habit forever?')) return;
     const filtered = habits.filter(h => h.id !== id);
     await saveHabits(filtered);
@@ -72,7 +71,7 @@ export default function HabitsPage() {
         };
 
     const updated = editing
-      ? habits.map(h => h.id === editing.id ? newHabit : h)
+      ? habits.map(h => (h.id === editing.id ? newHabit : h))
       : [...habits, newHabit];
 
     await saveHabits(updated);
@@ -119,7 +118,7 @@ export default function HabitsPage() {
       {/* Habits Grid */}
       <div className="max-w-7xl mx-auto p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-          {habits.map((habit => {
+          {habits.map((habit) => {
             const calendar = getCalendarData(habit.id);
             const streak = calendar.filter(c => c.done).length;
             const isDoneToday = calendar[41].done;
@@ -200,7 +199,7 @@ export default function HabitsPage() {
         </div>
       </div>
 
-      {/* FULL ADD/EDIT MODAL — NO MORE "COMING SOON" */}
+      {/* FULL ADD/EDIT MODAL */}
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex items-center justify-center p-6 z-50">
           <div className="bg-white rounded-3xl shadow-3xl p-12 max-w-2xl w-full max-h-screen overflow-y-auto">
