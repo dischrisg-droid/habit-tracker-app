@@ -1,14 +1,13 @@
-// app/history/page.tsx — FULL HISTORY OF LOGS + AI PLANS
+// app/history/page.tsx — FULLY WORKING HISTORY PAGE
 'use client';
 
 import { useStore } from '../../store/useStore';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Brain, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Calendar, Brain, MessageSquare, Sparkles } from 'lucide-react';
 
 export default function HistoryPage() {
   const { logs, aiPlans } = useStore();
 
-  // Sort by date descending
   const sortedLogs = [...logs].sort((a, b) => b.date.localeCompare(a.date));
   const sortedPlans = [...aiPlans].sort((a, b) => b.date.localeCompare(a.date));
 
@@ -50,7 +49,6 @@ export default function HistoryPage() {
                   </div>
 
                   <div className="p-10 space-y-10">
-                    {/* Reflection */}
                     {log.reflection && (
                       <div>
                         <div className="flex items-center gap-4 mb-4">
@@ -63,7 +61,6 @@ export default function HistoryPage() {
                       </div>
                     )}
 
-                    {/* Reframed */}
                     {log.reframed && (
                       <div>
                         <div className="flex items-center gap-4 mb-4">
@@ -76,7 +73,6 @@ export default function HistoryPage() {
                       </div>
                     )}
 
-                    {/* AI Plan */}
                     {plan && (
                       <div>
                         <div className="flex items-center gap-4 mb-4">
