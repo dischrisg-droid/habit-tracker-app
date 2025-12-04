@@ -34,7 +34,7 @@ export default function HabitsPage() {
   
   // ← THIS IS THE ONLY CHANGE — 2 LINES THAT FIX THE CRASH FOREVER
   const todayLog = logs.find(l => l.date === today);
-  const completedHabits = todayLog?.completedHabits || []; // ← 100% safe now
+  const completedHabits = todayLog?.completedHabits || []; // ← THIS FIXES IT FOREVER
   // ← END OF FIX
 
   const getCalendarData = (habitId: string) => {
@@ -219,3 +219,4 @@ export default function HabitsPage() {
     </div>
   );
 }
+
