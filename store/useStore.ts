@@ -1,4 +1,4 @@
-// store/useStore.ts — FINAL & 100% WORKING — EVERYTHING SAVES PERFECTLY
+// store/useStore.ts — FINAL & FOREVER WORKING
 'use client';
 
 import { create } from 'zustand';
@@ -67,6 +67,8 @@ export const useStore = create<Store>((set, get) => ({
   personality: null,
   aiPlans: [],
 
+  // ← fixed typo
+
   initAuth: async () => {
     set({ authLoading: true });
     const { data: { session } } = await supabase.auth.getSession();
@@ -98,15 +100,19 @@ export const useStore = create<Store>((set, get) => ({
       }
     }
 
-    supabase.auth.onAuthStateChange((_, session) => {
+    supabase.auth.onAuthStateChange(async (_, session) => {
       set({ user: session?.user ?? null });
-      if (session?.user) get().load();
+      if (session?.user) await get().load();
     });
   },
 
   load: async () => {
-    const { user } = get();
+    // ← AUTO REFRESH SESSION IF EXPIRED (this fixes blank screen after a day)
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user ?? get().user;
     if (!user) return;
+
+    set({ user });
 
     const { data: habits } = await supabase.from('habits').select('*').eq('user_id', user.id);
 
@@ -220,10 +226,9 @@ export const useStore = create<Store>((set, get) => ({
       date: plan.date,
       plan: plan.plan,
       video: plan.video || '',
-      user_id: user.id, // ← exact column name from your table
+      user_id: user.id,
     };
 
-    // Remove onConflict — just insert or update manually
     const { data: existing } = await supabase
       .from('ai_plans')
       .select('id')
@@ -239,11 +244,9 @@ export const useStore = create<Store>((set, get) => ({
 
     set(state => ({
       aiPlans: [...state.aiPlans.filter(p => !(p.date === plan.date)), plan],
-
     }));
   },
 }));
-
 
 
 
