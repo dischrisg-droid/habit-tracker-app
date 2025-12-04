@@ -46,7 +46,7 @@ export default function HabitsPage() {
     const log = logs.find(l => l.date === dateStr);
     
     // ← THIS LINE WAS CRASHING — NOW SAFE FOREVER
-    const done = log?.completedHabits?.includes(habitId) ?? false;
+    const done = log?.completed_habits?.includes(habitId) ?? false;
     
     data.push({ done, isToday: i === 0, date });
   }
@@ -223,5 +223,6 @@ export default function HabitsPage() {
     </div>
   );
 }
+
 
 
