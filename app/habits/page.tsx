@@ -1,4 +1,4 @@
-// app/habits/page.tsx — YOUR FULL ORIGINAL + EXAMPLE HABITS SECTION (300+ lines now!)
+// app/habits/page.tsx — YOUR FULL ORIGINAL CODE + EXAMPLE HABITS SECTION
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -8,38 +8,16 @@ import Link from 'next/link';
 import {
   Droplets, Brain, Dumbbell, BookOpen, Moon, Pen, Heart, Footprints,
   SmartphoneNfc, Snowflake, Move, Phone, Lightbulb, CandyOff, Bed,
-  Smile, Wind, Trees, Trophy, Coffee, Apple, Waves, Sunrise
+  Smile, Wind, Trees, Trophy
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
   Droplets, Brain, Dumbbell, BookOpen, Moon, Pen, Heart, Footprints,
   SmartphoneNfc, Snowflake, Move, Phone, Lightbulb, CandyOff, Bed,
-  Smile, Wind, Trees, Trophy, Activity, Coffee, Apple, Waves, Sunrise
+  Smile, Wind, Trees, Trophy, Activity
 };
 
 const dayLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-
-// ——— NEW: EXAMPLE HABITS ———
-const exampleHabits = [
-  { name: "Drink 2L water", icon: "Droplets", frequency: "daily", notes: "Stay hydrated!" },
-  { name: "Meditate 10 min", icon: "Brain", frequency: "daily", notes: "Morning calm" },
-  { name: "Exercise", icon: "Dumbbell", frequency: "daily", targettime: "30 min" },
-  { name: "Read 20 pages", icon: "BookOpen", frequency: "daily" },
-  { name: "Sleep 8 hours", icon: "Moon", frequency: "daily", notes: "10pm–6am" },
-  { name: "Morning journal", icon: "Pen", frequency: "daily" },
-  { name: "Gratitude practice", icon: "Heart", frequency: "daily" },
-  { name: "Walk 10k steps", icon: "Footprints", frequency: "daily" },
-  { name: "No screens after 9pm", icon: "SmartphoneNfc", frequency: "daily" },
-  { name: "Cold shower", icon: "Snowflake", frequency: "daily" },
-  { name: "Run 5km", icon: "Move", frequency: "weekly", days: [1, 3, 5] },
-  { name: "Call a friend", icon: "Phone", frequency: "weekly", days: [0, 3] },
-  { name: "Learn something new", icon: "Lightbulb", frequency: "daily" },
-  { name: "No sugar", icon: "CandyOff", frequency: "daily" },
-  { name: "Morning coffee ritual", icon: "Coffee", frequency: "daily" },
-  { name: "Eat fruit", icon: "Apple", frequency: "daily" },
-  { name: "Swim", icon: "Waves", frequency: "weekly", days: [2, 6] },
-  { name: "Sunrise watch", icon: "Sunrise", frequency: "weekly", days: [0] },
-];
 
 export default function HabitsPage() {
   const { habits, logs, saveHabits } = useStore();
@@ -61,7 +39,7 @@ export default function HabitsPage() {
 
   const today = new Date().toISOString().split('T')[0];
   const todayLog = logs.find(l => l.date === today);
-  const completedHabits = (todayLog as any)?.completed_habits || [];
+  const completedHabits = todayLog?.completedHabits || [];
 
   const getCalendarData = (habitId: string) => {
     const data = [];
@@ -70,7 +48,7 @@ export default function HabitsPage() {
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
       const log = logs.find(l => l.date === dateStr);
-      const done = (log as any)?.completed_habits?.includes(habitId) ?? false;
+      const done = log?.completedHabits?.includes(habitId) ?? false;
       data.push({ done, isToday: i === 0, date });
     }
     return data;
@@ -113,7 +91,7 @@ export default function HabitsPage() {
     }));
   };
 
-  // ——— ADD EXAMPLE HABIT ———
+  // ——— ADD EXAMPLE HABIT FROM EXAMPLES ———
   const addExampleHabit = async (example: any) => {
     const newHabit = {
       id: crypto.randomUUID(),
@@ -159,7 +137,7 @@ export default function HabitsPage() {
           <h2 className="text-5xl font-black text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
             Quick Start — Tap Any Habit to Add It
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-20">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-20">
             {exampleHabits.map((ex) => {
               const Icon = iconMap[ex.icon] || Activity;
               return (
@@ -182,7 +160,7 @@ export default function HabitsPage() {
         </div>
       )}
 
-      {/* YOUR FULL ORIGINAL HABITS GRID — 100% UNTOUCHED */}
+      {/* ——— YOUR FULL ORIGINAL HABITS GRID ——— */}
       <div className="max-w-7xl mx-auto p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
           {habits.map((habit) => {
@@ -190,6 +168,7 @@ export default function HabitsPage() {
             const streak = calendar.filter(c => c.done).length;
             const isDoneToday = calendar[41].done;
             const Icon = iconMap[habit.icon || ''] || Activity;
+
             return (
               <div key={habit.id} className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
                 <div className="p-6 flex items-center justify-between border-b bg-gradient-to-r from-indigo-50 to-purple-50">
@@ -263,7 +242,7 @@ export default function HabitsPage() {
         </div>
       </div>
 
-      {/* YOUR FULL ORIGINAL MODAL — 100% UNTOUCHED */}
+      {/* FULL ADD/EDIT MODAL */}
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex items-center justify-center p-6 z-50">
           <div className="bg-white rounded-3xl shadow-3xl p-12 max-w-2xl w-full max-h-screen overflow-y-auto">
