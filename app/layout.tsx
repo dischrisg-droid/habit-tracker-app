@@ -38,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </Link>
 
     {!authLoading && user ? (
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6">
         {/* Navigation Icons */}
         <div className="flex gap-4">
           <Link href="/" className="p-3 bg-blue-100 rounded-2xl hover:bg-blue-200 transition">
@@ -55,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </Link>
         </div>
 
-        {/* Example Habits + New Habit Buttons */}
+        {/* Example Habits + New Habit */}
         <div className="flex gap-4">
           <button
             onClick={() => setShowExampleHabits(true)}
@@ -64,9 +64,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Sparkles className="w-6 h-6" />
             Example Habits
           </button>
-
           <button
-            onClick={() => setShowForm(true)}
+            onClick={() => router.push('/habits')}
             className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:scale-105 transition flex items-center gap-3"
           >
             <Plus className="w-7 h-7" />
