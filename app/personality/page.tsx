@@ -23,13 +23,15 @@ export default function PersonalityPage() {
   useEffect(() => {
     if (personality) {
       setForm({
-mbti: personality?.mbti || '',
-enneagram: personality?.enneagram || '',
-wakeUp: personality?.wakeup || '',
-bedTime: personality?.bedtime || '',
-whoIWantToBe: personality?.who_i_want_to_be || '',
-howIWantToBeSeen: personality?.how_i_want_to_be_seen || '',
-whatIWantToStandFor: personality?.what_i_want_to_stand_for || '',
+personality: personality ? {
+        mbti: personality.mbti,
+        enneagram: personality.enneagram,
+        wakeup: personality.wakeup,
+        bedtime: personality.bedtime,
+        who_i_want_to_be: personality.who_i_want_to_be,
+        how_i_want_to_be_seen: personality.how_i_want_to_be_seen,
+        what_i_want_to_stand_for: personality.what_i_want_to_stand_for,
+      } : null,
       });
     }
   }, [personality]);
@@ -123,6 +125,7 @@ whatIWantToStandFor: personality?.what_i_want_to_stand_for || '',
     </div>
   );
 }
+
 
 
 
