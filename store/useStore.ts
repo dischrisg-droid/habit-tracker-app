@@ -99,14 +99,13 @@ export const useStore = create<Store>((set, get) => ({
 
     const { data: aiPlans } = await supabase.from('ai_plans').select('*').eq('user_id', user.id);
 
-    // ← FINAL FIX: map snake_case → camelCase AND match Log type exactly
     const logs = (rawLogs || []).map(log => ({
       date: log.date,
-      completed_habits: log.completed_habits || [],
-      extra_habits: log.extra_habits || [],
+      completedHabits: log.completed_habits || [],
+      extraHabits: log.extra_habits || [],
       reflection: log.reflection || '',
       reframed: log.reframed || '',
-    } as Log));
+    }));
 
     set({
       habits: habits || [],
@@ -114,11 +113,11 @@ export const useStore = create<Store>((set, get) => ({
       personality: personality ? {
         mbti: personality.mbti,
         enneagram: personality.enneagram,
-        wakeUp: personality.wakeup,
-        bedTime: personality.bedtime,
-        whoIWantToBe: personality.who_i_want_to_be,
-        howIWantToBeSeen: personality.how_i_want_to_be_seen,
-        whatIWantToStandFor: personality.what_i_want_to_stand_for,
+        wakeup: personality.wakeup,
+        bedtime: personality.bedtime,
+        who_i_want_to_be: personality.who_i_want_to_be,
+        how_i_want_to_be_seen: personality.how_i_want_to_be_seen,
+        what_i_want_to_stand_for: personality.what_i_want_to_stand_for,
       } : null,
       aiPlans: aiPlans || [],
     });
