@@ -38,7 +38,7 @@ export default function DailyLogPage() {
 
     await saveLog({
       date: today,
-      completedHabits: updatedCompleted,
+      completed_habits: updatedCompleted,
       reflection,
       reframed,
     });
