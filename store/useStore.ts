@@ -123,30 +123,37 @@ export const useStore = create<Store>((set, get) => ({
     });
   },
 
-    saveHabits: async (habits: Habit[]) => {
+  saveHabits: async (habits: Habit[]) => {
     const { user } = get();
     if (!user) return;
 
     try {
-      // First: delete old habits
-      await supabase.from('habits').delete().eq('user_id', user.id);
+      // First delete old habits
+      const { error: deleteError } = await supabase
+        .from('habits')
+        .delete()
+        .eq('user_id', user.id);
 
-      // Only insert if there are habits
+      if (deleteError) {
+        console.error('Failed to delete old habits:', deleteError);
+        return;
+      }
+
+      // Then insert new ones
       if (habits.length > 0) {
-        const { error } = await supabase
+        const { error: insertError } = await supabase
           .from('habits')
           .insert(habits.map(h => ({ ...h, user_id: user.id })));
 
-        if (error) {
-          console.error('Failed to save habits:', error);
+        if (insertError) {
+          console.error('Failed to insert new habits:', insertError);
           return;
         }
       }
 
-      // Update local state
       set({ habits });
     } catch (err) {
-      console.error('Save habits crashed:', err);
+      console.error('saveHabits crashed:', err);
     }
   },
 
@@ -225,6 +232,7 @@ export const useStore = create<Store>((set, get) => ({
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
