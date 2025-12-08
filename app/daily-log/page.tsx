@@ -1,9 +1,9 @@
-// app/daily-log/page.tsx — FINAL & 100% WORKING (no more TypeScript errors)
+// app/daily-log/page.tsx — FINAL & CLEAN (no duplicate icons)
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useState } from 'react';
-import { Check, Sparkles, Flame, User } from 'lucide-react';
+import { Check, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
 
@@ -13,7 +13,6 @@ export default function DailyLogPage() {
   const today = new Date().toISOString().split('T')[0];
   const todayLog = logs.find(l => l.date === today);
 
-  // ← 100% SAFE — works even if todayLog doesn't exist yet
   const initialCompleted = (todayLog as any)?.completed_habits || [];
   const initialReflection = todayLog?.reflection || '';
   const initialReframed = todayLog?.reframed || '';
@@ -23,7 +22,7 @@ export default function DailyLogPage() {
   const [reframed, setReframed] = useState(initialReframed);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
-  const JOURNAL_HABIT_ID = "78eaa216-6a80-40d7-9f49-25a6a94768e5"; // ← your Journal habit ID
+  const JOURNAL_HABIT_ID = "78eaa216-6a80-40d7-9f49-25a6a94768e5";
 
   const handleSave = async () => {
     setSaveStatus('saving');
@@ -58,20 +57,12 @@ export default function DailyLogPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      {/* Header */}
+      {/* Header — icons removed (they're in global header now) */}
       <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/20">
-        <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-center">
           <h1 className="text-5xl font-black bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
             Daily Log
           </h1>
-          <div className="flex gap-4">
-            <Link href="/habits" className="p-3 bg-indigo-100 rounded-2xl hover:bg-indigo-200 transition">
-              <Flame className="w-7 h-7 text-indigo-700" />
-            </Link>
-            <Link href="/personality" className="p-3 bg-pink-100 rounded-2xl hover:bg-pink-200 transition">
-              <User className="w-7 h-7 text-pink-700" />
-            </Link>
-          </div>
         </div>
       </div>
 
