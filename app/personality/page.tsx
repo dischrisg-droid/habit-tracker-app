@@ -25,11 +25,11 @@ export default function PersonalityPage() {
       setForm({
 mbti: personality?.mbti || '',
 enneagram: personality?.enneagram || '',
-wakeUp: personality?.wakeUp || '',
-bedTime: personality?.bedTime || '',
-whoIWantToBe: personality?.whoIWantToBe || '',
-howIWantToBeSeen: personality?.howIWantToBeSeen || '',
-whatIWantToStandFor: personality?.whatIWantToStandFor || '',
+wakeUp: personality?.wakeup || '',
+bedTime: personality?.bedtime || '',
+whoIWantToBe: personality?.who_i_want_to_be || '',
+howIWantToBeSeen: personality?.how_i_want_to_be_seen || '',
+whatIWantToStandFor: personality?.what_i_want_to_stand_for || '',
       });
     }
   }, [personality]);
@@ -123,6 +123,7 @@ whatIWantToStandFor: personality?.whatIWantToStandFor || '',
     </div>
   );
 }
+
 
 
 
