@@ -1,9 +1,9 @@
-// app/habits/page.tsx — FINAL & 100% WORKING (example habits + everything else)
+// app/habits/page.tsx — YOUR FULL ORIGINAL + EXAMPLE HABITS SECTION (300+ lines)
 'use client';
 
 import { useStore } from '../../store/useStore';
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, ArrowLeft, Flame, Check, X, Save, Activity } from 'lucide-react';
+import { Plus, Edit2, Trash2, ArrowLeft, Flame, Check, X, Save, Activity, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import {
   Droplets, Brain, Dumbbell, BookOpen, Moon, Pen, Heart, Footprints,
@@ -54,6 +54,8 @@ export default function HabitsPage() {
     notes: '',
     icon: 'Activity',
   });
+
+  const [showExampleHabits, setShowExampleHabits] = useState(false);
 
   const today = new Date().toISOString().split('T')[0];
   const todayLog = logs.find(l => l.date === today);
@@ -136,49 +138,65 @@ export default function HabitsPage() {
               My Habits
             </h1>
           </Link>
-          <button
-            onClick={() => {
-              setEditing(null);
-              setForm({ name: '', frequency: 'daily', days: [], targettime: '', notes: '', icon: 'Activity' });
-              setShowForm(true);
-            }}
-            className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:scale-105 transition flex items-center gap-3"
-          >
-            <Plus className="w-7 h-7" /> New Habit
-          </button>
+
+          <div className="flex gap-4">
+            <button
+              onClick={() => setShowExampleHabits(true)}
+              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold rounded-2xl shadow-lg hover:scale-105 transition flex items-center gap-2"
+            >
+              <Sparkles className="w-6 h-6" />
+              Example Habits
+            </button>
+            <button
+              onClick={() => {
+                setEditing(null);
+                setForm({ name: '', frequency: 'daily', days: [], targettime: '', notes: '', icon: 'Activity' });
+                setShowForm(true);
+              }}
+              className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:scale-105 transition flex items-center gap-3"
+            >
+              <Plus className="w-7 h-7" /> New Habit
+            </button>
+          </div>
         </div>
       </div>
 
       {/* ——— EXAMPLE HABITS SECTION ——— */}
-      {habits.length === 0 && (
-        <div className="max-w-7xl mx-auto p-8 pb-0">
-          <h2 className="text-5xl font-black text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Quick Start — Tap Any Habit to Add It
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-20">
-            {exampleHabits.map((ex) => {
-              const Icon = iconMap[ex.icon] || Activity;
-              return (
-                <button
-                  key={ex.name}
-                  onClick={() => addExampleHabit(ex)}
-                  className="group relative p-10 bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl hover:shadow-3xl transition-all hover:scale-110 border border-white/50"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition" />
-                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition">
-                    <Plus className="w-10 h-10 text-indigo-600" />
-                  </div>
-                  <Icon className="w-20 h-20 mx-auto mb-6 text-indigo-600" />
-                  <div className="text-2xl font-bold text-gray-800 text-center">{ex.name}</div>
-                  {ex.notes && <div className="text-sm text-gray-600 text-center mt-3">{ex.notes}</div>}
-                </button>
-              );
-            })}
+      {showExampleHabits && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex items-center justify-center p-6 z-50">
+          <div className="bg-white rounded-3xl shadow-3xl p-12 max-w-4xl w-full max-h-screen overflow-y-auto">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-4xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Quick Start — Tap to Add
+              </h2>
+              <button
+                onClick={() => setShowExampleHabits(false)}
+                className="p-3 bg-gray-200 rounded-2xl hover:bg-gray-300 transition"
+              >
+                <X className="w-8 h-8" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              {exampleHabits.map((ex) => {
+                const Icon = iconMap[ex.icon] || Activity;
+                return (
+                  <button
+                    key={ex.name}
+                    onClick={() => addExampleHabit(ex)}
+                    className="p-8 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl hover:scale-105 transition shadow-lg border border-white/50 text-left"
+                  >
+                    <Icon className="w-16 h-16 mb-4 text-indigo-600" />
+                    <div className="text-xl font-bold">{ex.name}</div>
+                    {ex.notes && <div className="text-sm text-gray-600 mt-2">{ex.notes}</div>}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
 
-      {/* ——— YOUR ORIGINAL HABITS GRID — */}
+      {/* ——— YOUR ORIGINAL HABITS GRID ——— */}
       <div className="max-w-7xl mx-auto p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
           {habits.map((habit) => {
@@ -343,6 +361,7 @@ export default function HabitsPage() {
     </div>
   );
 }
+
 
 
 
