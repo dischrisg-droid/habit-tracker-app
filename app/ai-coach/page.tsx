@@ -19,6 +19,7 @@ export default function AICoachPage() {
     const todayLog = logs[logs.length - 1];
     const mbti = personality?.mbti?.toUpperCase() || 'UNKNOWN';
     const vision = personality?.who_i_want_to_be || 'your highest self';
+    
 
     const callAI = async () => {
       const res = await fetch('/api/ai-plan', {
@@ -28,7 +29,7 @@ export default function AICoachPage() {
           messages: [{
             role: 'system',
             content: `You are a world-class coach for a ${mbti} 6w5 who wants to become: "${vision}".
-Today they completed ${todayLog?.completedHabits?.length || 0}/${habits.length} habits.
+Today they completed ${todayLog?.completed_habits?.length || 0}/${habits.length} habits.
 Journal: "${todayLog?.reflection || 'none'}"
 Reframed: "${todayLog?.reframed || 'none'}"
 
