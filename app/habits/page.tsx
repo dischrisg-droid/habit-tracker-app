@@ -1,4 +1,4 @@
-// app/habits/page.tsx — YOUR FULL ORIGINAL CODE + EXAMPLE HABITS SECTION
+// app/habits/page.tsx — FINAL & 100% WORKING (example habits + everything else)
 'use client';
 
 import { useStore } from '../../store/useStore';
@@ -18,6 +18,24 @@ const iconMap: Record<string, any> = {
 };
 
 const dayLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+// ——— EXAMPLE HABITS ———
+const exampleHabits = [
+  { name: "Drink 2L water", icon: "Droplets", frequency: "daily", notes: "Stay hydrated!" },
+  { name: "Meditate 10 min", icon: "Brain", frequency: "daily", notes: "Morning calm" },
+  { name: "Exercise", icon: "Dumbbell", frequency: "daily", targettime: "30 min" },
+  { name: "Read 20 pages", icon: "BookOpen", frequency: "daily" },
+  { name: "Sleep 8 hours", icon: "Moon", frequency: "daily", notes: "10pm–6am" },
+  { name: "Morning journal", icon: "Pen", frequency: "daily" },
+  { name: "Gratitude practice", icon: "Heart", frequency: "daily" },
+  { name: "Walk 10k steps", icon: "Footprints", frequency: "daily" },
+  { name: "No screens after 9pm", icon: "SmartphoneNfc", frequency: "daily" },
+  { name: "Cold shower", icon: "Snowflake", frequency: "daily" },
+  { name: "Run 5km", icon: "Move", frequency: "weekly", days: [1, 3, 5] },
+  { name: "Call a friend", icon: "Phone", frequency: "weekly", days: [0, 3] },
+  { name: "Learn something new", icon: "Lightbulb", frequency: "daily" },
+  { name: "No sugar", icon: "CandyOff", frequency: "daily" },
+];
 
 export default function HabitsPage() {
   const { habits, logs, saveHabits } = useStore();
@@ -91,7 +109,7 @@ export default function HabitsPage() {
     }));
   };
 
-  // ——— ADD EXAMPLE HABIT FROM EXAMPLES ———
+  // ——— ADD EXAMPLE HABIT ———
   const addExampleHabit = async (example: any) => {
     const newHabit = {
       id: crypto.randomUUID(),
@@ -131,7 +149,7 @@ export default function HabitsPage() {
         </div>
       </div>
 
-      {/* ——— NEW: EXAMPLE HABITS SECTION (ONLY SHOWS WHEN NO HABITS) ——— */}
+      {/* ——— EXAMPLE HABITS SECTION ——— */}
       {habits.length === 0 && (
         <div className="max-w-7xl mx-auto p-8 pb-0">
           <h2 className="text-5xl font-black text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
@@ -160,7 +178,7 @@ export default function HabitsPage() {
         </div>
       )}
 
-      {/* ——— YOUR FULL ORIGINAL HABITS GRID ——— */}
+      {/* ——— YOUR ORIGINAL HABITS GRID — */}
       <div className="max-w-7xl mx-auto p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
           {habits.map((habit) => {
