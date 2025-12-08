@@ -88,25 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       </Link>
                     </div>
 
-                    {/* Example Habits + New Habit */}
-                    <div className="flex gap-4">
-                      <button
-                        onClick={() => setShowExampleHabits(true)}
-                        className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold rounded-2xl shadow-lg hover:scale-105 transition flex items-center gap-2"
-                      >
-                        <Sparkles className="w-6 h-6" />
-                        Example Habits
-                      </button>
-                      <Link
-                        href="/habits"
-                        className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:scale-105 transition flex items-center gap-3"
-                      >
-                        <Plus className="w-7 h-7" />
-                        New Habit
-                      </Link>
-                    </div>
-
-                    {/* User + Logout */}
+                                        {/* User + Logout */}
                     <div className="flex items-center gap-4 border-l pl-6 border-gray-200">
                       <span className="text-gray-600 hidden sm:inline">{user.email}</span>
                       <button
