@@ -23,7 +23,8 @@ export default function PersonalityPage() {
   useEffect(() => {
     if (personality) {
       setForm({
-personality: personality ? {
+
+   personality: personality ? {
         mbti: personality.mbti,
         enneagram: personality.enneagram,
         wakeup: personality.wakeup,
@@ -125,6 +126,7 @@ personality: personality ? {
     </div>
   );
 }
+
 
 
 
