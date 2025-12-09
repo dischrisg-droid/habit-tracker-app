@@ -124,40 +124,31 @@ export const useStore = create<Store>((set, get) => ({
     });
   },
 
-  saveHabits: async (habits: Habit[]) => {
+   saveHabits: async (habits: Habit[]) => {
     const { user } = get();
     if (!user) return;
 
     try {
-      // 1. Fetch current habits from Supabase
-      const { data: current } = await supabase
-        .from('habits')
-        .select('id')
-        .eq('user_id', user.id);
+      // Delete old habits
+      await supabase.from('habits').delete().eq('user_id', user.id);
 
-      const currentIds = current?.map(h => h.id) || [];
+      // Insert new ones
+      if (habits.length > 0) {
+        const { error } = await supabase
+          .from('habits')
+          .insert(habits.map(h => ({ ...h, user_id: user.id })));
 
-      // 2. Find which habits to delete (not in new list)
-      const toDelete = currentIds.filter(id => !habits.some(h => h.id === id));
-      if (toDelete.length > 0) {
-        await supabase.from('habits').delete().in('id', toDelete);
-      }
-
-      // 3. Find which habits to insert/update
-      const toUpsert = habits.map(h => ({ ...h, user_id: user.id }));
-      if (toUpsert.length > 0) {
-        const { error } = await supabase.from('habits').upsert(toUpsert, { onConflict: 'id' });
         if (error) throw error;
       }
 
-      // 4. Update local state
+      // ← THIS LINE WAS MISSING — FORCES UI TO UPDATE IMMEDIATELY
       set({ habits });
+      await get().load(); // ← RELOAD FROM SUPABASE TO BE 100% SURE
+
     } catch (err) {
       console.error('Failed to save habits:', err);
-      // Optional: alert('Save failed — check internet');
     }
   },
-
   saveLog: async (log: any) => {
     const { user } = get();
     if (!user) return;
@@ -233,6 +224,7 @@ export const useStore = create<Store>((set, get) => ({
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
