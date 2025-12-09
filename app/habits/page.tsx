@@ -69,6 +69,7 @@ useEffect(() => {
     await saveHabits(filtered);
   };
   const saveHabit = async () => {
+    console.log('SAVE HABIT BUTTON CLICKED');
     if (!form.name.trim()) return;
     const newHabit = editing
       ? { ...editing, ...form, name: form.name.trim() }
@@ -343,6 +344,7 @@ const addExampleHabit = async (example: any) => {
     </div>
   );
 }
+
 
 
 
