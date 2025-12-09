@@ -40,9 +40,9 @@ const exampleHabits = [
 export default function HabitsPage() {
   const { habits, logs, saveHabits } = useStore();
 
-  useEffect(() => {
-    useStore.getState().load();
-  }, []);
+useEffect(() => {
+  useStore.getState().load(); // ← THIS LINE MAKES HABITS APPEAR INSTANTLY
+}, []);
 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
@@ -361,6 +361,7 @@ export default function HabitsPage() {
     </div>
   );
 }
+
 
 
 
