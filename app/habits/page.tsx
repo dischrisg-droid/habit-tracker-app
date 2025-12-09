@@ -182,6 +182,7 @@ const addExampleHabit = async (example: any) => {
                 const Icon = iconMap[ex.icon] || Activity;
                 return (
                   <button
+                    type="button"
                     key={ex.name}
                     onClick={() => addExampleHabit(ex)}
                     className="p-8 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl hover:scale-105 transition shadow-lg border border-white/50 text-left"
@@ -362,6 +363,7 @@ const addExampleHabit = async (example: any) => {
     </div>
   );
 }
+
 
 
 
