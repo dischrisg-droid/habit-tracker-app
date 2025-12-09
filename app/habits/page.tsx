@@ -110,9 +110,8 @@ useEffect(() => {
         : [...prev.days, day],
     }));
   };
-
-  // ——— ADD EXAMPLE HABIT ———
-  const addExampleHabit = async (example: any) => {
+  
+const addExampleHabit = async (example: any) => {
     const newHabit = {
       id: crypto.randomUUID(),
       name: example.name,
@@ -122,6 +121,8 @@ useEffect(() => {
       notes: example.notes || '',
       icon: example.icon,
     };
+
+    // ← THIS IS THE ONLY LINE THAT MATTERS
     await saveHabits([...habits, newHabit]);
   };
 
@@ -361,6 +362,7 @@ useEffect(() => {
     </div>
   );
 }
+
 
 
 
