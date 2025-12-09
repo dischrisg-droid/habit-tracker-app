@@ -126,33 +126,25 @@ export const useStore = create<Store>((set, get) => ({
 
 saveHabits: async (habits: Habit[]) => {
     const { user } = get();
-    if (!user?.id) {
-      console.error('No user ID — cannot save habits');
-      return;
-    }
+    if (!user) return;
 
     try {
-      // Delete old habits
       await supabase.from('habits').delete().eq('user_id', user.id);
 
-      // Insert new ones — with explicit user_id
       if (habits.length > 0) {
-        const habitsToInsert = habits.map(h => ({
-          ...h,
-          user_id: user.id, // ← THIS WAS MISSING OR WRONG
-        }));
+        const { error } = await supabase
+          .from('habits')
+          .insert(habits.map(h => ({ ...h, user_id: user.id })));
 
-        const { error } = await supabase.from('habits').insert(habitsToInsert);
-        if (error) {
-          console.error('Insert failed:', error);
-          return;
-        }
+        if (error) throw error;
       }
 
-      set({ habits });
-      console.log('Habits saved:', habits.length);
+      // ← THIS IS THE MAGIC LINE — FORCES INSTANT UI UPDATE
+      set(state => ({ ...state, habits }));
+
+      console.log('Habits saved and UI updated:', habits.length);
     } catch (err) {
-      console.error('saveHabits error:', err);
+      console.error('saveHabits failed:', err);
     }
   },
   saveLog: async (log: any) => {
@@ -230,6 +222,7 @@ saveHabits: async (habits: Habit[]) => {
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
