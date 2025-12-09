@@ -99,17 +99,18 @@ useEffect(() => {
   };
  
 const addExampleHabit = async (example: any) => {
-    const newHabit = {
-      id: crypto.randomUUID(),
-      name: example.name,
-      frequency: example.frequency,
-      days: example.days || [],
-      targettime: example.targettime || '',
-      notes: example.notes || '',
-      icon: example.icon,
-    };
-    await saveHabits([...habits, newHabit]);
+  console.log('EXAMPLE HABIT CLICKED:', example.name); // ← ADD THIS LINE
+  const newHabit = {
+    id: crypto.randomUUID(),
+    name: example.name,
+    frequency: example.frequency,
+    days: example.days || [],
+    targettime: example.targettime || '',
+    notes: example.notes || '',
+    icon: example.icon,
   };
+  await saveHabits([...habits, newHabit]);
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
       {/* Header */}
@@ -342,6 +343,7 @@ const addExampleHabit = async (example: any) => {
     </div>
   );
 }
+
 
 
 
