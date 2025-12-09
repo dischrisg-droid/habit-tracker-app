@@ -124,27 +124,30 @@ export const useStore = create<Store>((set, get) => ({
     });
   },
 
-saveHabits: async (habits: Habit[]) => {
+  saveHabits: async (habits: Habit[]) => {
     const { user } = get();
     if (!user) return;
 
     try {
       await supabase.from('habits').delete().eq('user_id', user.id);
+
       if (habits.length > 0) {
         const { error } = await supabase
           .from('habits')
           .insert(habits.map(h => ({ ...h, user_id: user.id })));
+
         if (error) throw error;
       }
 
-      // ← THIS IS THE ONLY LINE THAT MATTERS — FORCE NEW ARRAY REFERENCE
-      set({ habits: [...habits] });
+      // ← THIS IS THE NUCLEAR FIX — FORCES REACT TO RE-RENDER
+      set({ habits: habits.map(h => ({ ...h })) });
 
-      console.log('Habits saved — UI forced update');
+      console.log('HABITS SAVED & UI FORCED TO UPDATE — LENGTH:', habits.length);
     } catch (err) {
       console.error('saveHabits failed:', err);
     }
   },
+  
   saveLog: async (log: any) => {
     const { user } = get();
     if (!user) return;
@@ -220,6 +223,7 @@ saveHabits: async (habits: Habit[]) => {
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
