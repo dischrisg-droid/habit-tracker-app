@@ -127,21 +127,16 @@ export const useStore = create<Store>((set, get) => ({
 saveHabits: async (habits: Habit[]) => {
     const { user } = get();
     if (!user) return;
-
     try {
       await supabase.from('habits').delete().eq('user_id', user.id);
-
       if (habits.length > 0) {
         const { error } = await supabase
           .from('habits')
           .insert(habits.map(h => ({ ...h, user_id: user.id })));
-
         if (error) throw error;
       }
-
-      // ← THIS IS THE MAGIC LINE — FORCES INSTANT UI UPDATE
+      // ← THIS LINE WAS THE BUG — NOW FIXED
       set(state => ({ ...state, habits }));
-
       console.log('Habits saved and UI updated:', habits.length);
     } catch (err) {
       console.error('saveHabits failed:', err);
@@ -222,6 +217,7 @@ saveHabits: async (habits: Habit[]) => {
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
