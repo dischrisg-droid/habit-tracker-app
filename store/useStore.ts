@@ -127,6 +127,7 @@ export const useStore = create<Store>((set, get) => ({
 saveHabits: async (habits: Habit[]) => {
     const { user } = get();
     if (!user) return;
+
     try {
       await supabase.from('habits').delete().eq('user_id', user.id);
       if (habits.length > 0) {
@@ -135,9 +136,11 @@ saveHabits: async (habits: Habit[]) => {
           .insert(habits.map(h => ({ ...h, user_id: user.id })));
         if (error) throw error;
       }
-      // ← THIS LINE WAS THE BUG — NOW FIXED
-      set(state => ({ ...state, habits }));
-      console.log('Habits saved and UI updated:', habits.length);
+
+      // ← THIS IS THE ONLY LINE THAT MATTERS — FORCE NEW ARRAY REFERENCE
+      set({ habits: [...habits] });
+
+      console.log('Habits saved — UI forced update');
     } catch (err) {
       console.error('saveHabits failed:', err);
     }
@@ -217,6 +220,7 @@ saveHabits: async (habits: Habit[]) => {
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
