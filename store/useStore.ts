@@ -126,38 +126,33 @@ export const useStore = create<Store>((set, get) => ({
 
 saveHabits: async (habits: Habit[]) => {
     const { user } = get();
-    if (!user) return;
+    if (!user?.id) {
+      console.error('No user ID — cannot save habits');
+      return;
+    }
 
     try {
-      // 1. Delete all old habits for this user
-      const { error: deleteError } = await supabase
-        .from('habits')
-        .delete()
-        .eq('user_id', user.id);
+      // Delete old habits
+      await supabase.from('habits').delete().eq('user_id', user.id);
 
-      if (deleteError) {
-        console.error('Delete failed:', deleteError);
-        return;
-      }
-
-      // 2. Insert the new list
+      // Insert new ones — with explicit user_id
       if (habits.length > 0) {
-        const { error: insertError } = await supabase
-          .from('habits')
-          .insert(habits.map(h => ({ ...h, user_id: user.id })));
+        const habitsToInsert = habits.map(h => ({
+          ...h,
+          user_id: user.id, // ← THIS WAS MISSING OR WRONG
+        }));
 
-        if (insertError) {
-          console.error('Insert failed:', insertError);
+        const { error } = await supabase.from('habits').insert(habitsToInsert);
+        if (error) {
+          console.error('Insert failed:', error);
           return;
         }
       }
 
-      // 3. Update local state — THIS IS WHAT MAKES IT SHOW INSTANTLY
       set({ habits });
-
-      console.log('Habits saved successfully:', habits.length, 'habits');
+      console.log('Habits saved:', habits.length);
     } catch (err) {
-      console.error('saveHabits crashed:', err);
+      console.error('saveHabits error:', err);
     }
   },
   saveLog: async (log: any) => {
@@ -235,6 +230,7 @@ saveHabits: async (habits: Habit[]) => {
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
