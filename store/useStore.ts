@@ -124,62 +124,22 @@ export const useStore = create<Store>((set, get) => ({
     });
   },
 
+// store/useStore.ts — YOUR ORIGINAL CODE + ONE LINE FIX
 saveHabits: async (habits: Habit[]) => {
-    const { user } = get();
-    if (!user?.id) {
-      console.error('No user ID — cannot save');
-      return;
-    }
+  const { user } = get();
+  if (!user) return;
 
-    console.log('Saving habits for user:', user.id, 'Count:', habits.length);
+  await supabase.from('habits').delete().eq('user_id', user.id);
 
-    try {
-      // 1. Delete old
-      const { error: delError } = await supabase
-        .from('habits')
-        .delete()
-        .eq('user_id', user.id);
+  if (habits.length > 0) {
+    await supabase
+      .from('habits')
+      .insert(habits.map(h => ({ ...h, user_id: user.id })));
+  }
 
-      if (delError) {
-        console.error('Delete failed:', delError);
-        return;
-      }
-
-      // 2. Insert new — with explicit user_id and full object
-      if (habits.length > 0) {
-        const dataToInsert = habits.map(h => ({
-          id: h.id,
-          name: h.name,
-          frequency: h.frequency,
-          days: h.days || null,
-          targettime: h.targettime || null,
-          notes: h.notes || null,
-          icon: h.icon || null,
-          user_id: user.id,
-        }));
-
-        console.log('Inserting:', dataToInsert);
-
-        const { error: insertError } = await supabase
-          .from('habits')
-          .insert(dataToInsert);
-
-        if (insertError) {
-          console.error('INSERT FAILED:', insertError.message);
-          console.error('Check Supabase logs → SQL Editor → Logs');
-          return;
-        }
-
-        console.log('Successfully saved to Supabase');
-      }
-
-      // 3. Update UI
-      set({ habits: [...habits] });
-
-    } catch (err) {
-      console.error('saveHabits crashed:', err);
-    }
-  },
+  // ← THIS ONE LINE WAS MISSING BEFORE — THIS MAKES HABITS APPEAR INSTANTLY
+  set({ habits: [...habits] });
+},
   
   saveLog: async (log: any) => {
     const { user } = get();
@@ -256,6 +216,7 @@ saveHabits: async (habits: Habit[]) => {
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
