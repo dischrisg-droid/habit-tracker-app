@@ -131,17 +131,17 @@ saveHabits: async (habits: Habit[]) => {
     await supabase.from('habits').delete().eq('user_id', user.id);
 
     if (habits.length > 0) {
-      await supabase
-        .from('habits')
-        .insert(habits.map(h => ({ 
-          ...h, 
-          user_id: user.id,
-          days: h.days || null,           // ← THIS FIXES THE NULL ISSUE
-          targettime: h.targettime || null // ← THIS FIXES THE NULL ISSUE
-        })));
+      const cleanHabits = habits.map(h => ({
+        ...h,
+        user_id: user.id,
+        days: h.days && h.days.length > 0 ? h.days : null,        // ← FIXED
+        targettime: h.targettime && h.targettime.trim() ? h.targettime : null, // ← FIXED
+      }));
+
+      await supabase.from('habits').insert(cleanHabits);
     }
 
-    set({ habits }); // ← THIS MAKES IT APPEAR INSTANTLY
+    set({ habits }); // UI appears instantly
   },
   
   saveLog: async (log: any) => {
@@ -219,6 +219,7 @@ saveHabits: async (habits: Habit[]) => {
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
