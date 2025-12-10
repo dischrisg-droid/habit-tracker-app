@@ -129,20 +129,25 @@ export const useStore = create<Store>((set, get) => ({
     if (!user) return;
 
     try {
+      // Delete old habits
       await supabase.from('habits').delete().eq('user_id', user.id);
 
+      // Insert new ones
       if (habits.length > 0) {
         const { error } = await supabase
           .from('habits')
           .insert(habits.map(h => ({ ...h, user_id: user.id })));
 
-        if (error) throw error;
+        if (error) {
+          console.error('Failed to save habits:', error);
+          return;
+        }
       }
 
-      // ← THIS IS THE NUCLEAR FIX — FORCES REACT TO RE-RENDER
-      set({ habits: habits.map(h => ({ ...h })) });
+      // ← THIS IS THE ONLY LINE THAT MATTERS — FORCES INSTANT UI UPDATE
+      set({ habits: [...habits] });
 
-      console.log('HABITS SAVED & UI FORCED TO UPDATE — LENGTH:', habits.length);
+      console.log('Habits saved — UI updated instantly');
     } catch (err) {
       console.error('saveHabits failed:', err);
     }
@@ -223,6 +228,7 @@ export const useStore = create<Store>((set, get) => ({
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
