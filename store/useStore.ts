@@ -128,29 +128,20 @@ saveHabits: async (habits: Habit[]) => {
     const { user } = get();
     if (!user) return;
 
-    try {
-      await supabase.from('habits').delete().eq('user_id', user.id);
+    await supabase.from('habits').delete().eq('user_id', user.id);
 
-      if (habits.length > 0) {
-        const cleanHabits = habits.map(h => ({
-          id: h.id,
-          name: h.name,
-          frequency: h.frequency,
+    if (habits.length > 0) {
+      await supabase
+        .from('habits')
+        .insert(habits.map(h => ({ 
+          ...h, 
           user_id: user.id,
-          ...(h.days && h.days.length > 0 && { days: h.days }),
-          ...(h.targettime && { targettime: h.targettime }),
-          ...(h.notes && { notes: h.notes }),
-          ...(h.icon && { icon: h.icon }),
-        }));
-
-        const { error } = await supabase.from('habits').insert(cleanHabits);
-        if (error) throw error;
-      }
-
-      set({ habits });
-    } catch (err) {
-      console.error('Save failed:', err);
+          days: h.days || null,           // ← THIS FIXES THE NULL ISSUE
+          targettime: h.targettime || null // ← THIS FIXES THE NULL ISSUE
+        })));
     }
+
+    set({ habits }); // ← THIS MAKES IT APPEAR INSTANTLY
   },
   
   saveLog: async (log: any) => {
@@ -228,6 +219,7 @@ saveHabits: async (habits: Habit[]) => {
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
