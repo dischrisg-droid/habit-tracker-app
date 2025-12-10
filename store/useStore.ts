@@ -129,25 +129,14 @@ export const useStore = create<Store>((set, get) => ({
     if (!user) return;
 
     try {
-      // Delete old habits
       await supabase.from('habits').delete().eq('user_id', user.id);
-
-      // Insert new ones
       if (habits.length > 0) {
-        const { error } = await supabase
-          .from('habits')
-          .insert(habits.map(h => ({ ...h, user_id: user.id })));
-
-        if (error) {
-          console.error('Failed to save habits:', error);
-          return;
-        }
+        await supabase.from('habits').insert(habits.map(h => ({ ...h, user_id: user.id })));
       }
 
-      // ← THIS IS THE ONLY LINE THAT MATTERS — FORCES INSTANT UI UPDATE
+      // ← THIS LINE MAKES HABITS APPEAR INSTANTLY
       set({ habits: [...habits] });
 
-      console.log('Habits saved — UI updated instantly');
     } catch (err) {
       console.error('saveHabits failed:', err);
     }
@@ -228,6 +217,7 @@ export const useStore = create<Store>((set, get) => ({
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
