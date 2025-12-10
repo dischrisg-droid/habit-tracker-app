@@ -128,17 +128,29 @@ saveHabits: async (habits: Habit[]) => {
     const { user } = get();
     if (!user) return;
 
-    // ← THIS WAS THE ONLY THING WRONG
-    await supabase.from('habits').delete().eq('user_id', user.id);
+    try {
+      await supabase.from('habits').delete().eq('user_id', user.id);
 
-    if (habits.length > 0) {
-      await supabase
-        .from('habits')
-        .insert(habits.map(h => ({ ...h, user_id: user.id })));
+      if (habits.length > 0) {
+        const cleanHabits = habits.map(h => ({
+          id: h.id,
+          name: h.name,
+          frequency: h.frequency,
+          user_id: user.id,
+          ...(h.days && h.days.length > 0 && { days: h.days }),
+          ...(h.targettime && { targettime: h.targettime }),
+          ...(h.notes && { notes: h.notes }),
+          ...(h.icon && { icon: h.icon }),
+        }));
+
+        const { error } = await supabase.from('habits').insert(cleanHabits);
+        if (error) throw error;
+      }
+
+      set({ habits });
+    } catch (err) {
+      console.error('Save failed:', err);
     }
-
-    // ← THIS LINE MAKES IT APPEAR INSTANTLY (you had it before)
-    set({ habits });
   },
   
   saveLog: async (log: any) => {
@@ -216,6 +228,7 @@ saveHabits: async (habits: Habit[]) => {
     await supabase.from('ai_plans').upsert(payload, { onConflict: 'user_id,date' });
   },
 }));
+
 
 
 
